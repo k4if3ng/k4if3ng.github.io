@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>my first blog</title>
-    <url>/2024/12/11/2024-12-11-my-first-blog/</url>
+    <url>/2024/12/11/2024-2024-12-11-my-first-blog/</url>
     <content><![CDATA[<p>临近期末，pj 压身，尝试创建 blog 进行放松（对，对吗？</p>
 <p>唉，数字逻辑</p>
 <p>唉，论文</p>
@@ -17,11 +17,140 @@
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;hello world&quot;</span> &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
-        <category>Blog</category>
+        <category>blog</category>
       </categories>
       <tags>
         <tag>blog</tag>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>wsl里使用code打开vscode失败解决方法记录</title>
+    <url>/2025/02/05/2025-2025-02-05-wsl%E9%87%8C%E4%BD%BF%E7%94%A8code%E6%89%93%E5%BC%80vscode%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<h3 id="问题："><a href="#问题：" class="headerlink" title="问题："></a>问题：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/mnt/d/Microsoft VS Code/bin/code: 61: /mnt/d/Microsoft VS Code/Code.exe: Exec format error</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> sh -c <span class="string">&#x27;echo :WSLInterop:M::MZ::/init:PF &gt; /usr/lib/binfmt.d/WSLInterop.conf&#x27;</span></span><br><span class="line"><span class="built_in">sudo</span> systemctl unmask systemd-binfmt.service</span><br><span class="line"><span class="built_in">sudo</span> systemctl restart systemd-binfmt</span><br><span class="line"><span class="built_in">sudo</span> systemctl mask systemd-binfmt.service</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>wsl</category>
+      </categories>
+      <tags>
+        <tag>wsl, vscode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nju ics pa2</title>
+    <url>/2025/01/28/2025-ics-2025-01-28-nju-ics-pa2/</url>
+    <content><![CDATA[<h2 id="pa2-1"><a href="#pa2-1" class="headerlink" title="pa2.1"></a>pa2.1</h2><h3 id="RTFSC-2"><a href="#RTFSC-2" class="headerlink" title="RTFSC(2)"></a>RTFSC(2)</h3><h4 id="macro-h"><a href="#macro-h" class="headerlink" title="macro.h"></a>macro.h</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> BITMASK(bits) ((1ull &lt;&lt; (bits)) - 1)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS(x, hi, lo) (((x) &gt;&gt; (lo)) &amp; BITMASK((hi) - (lo) + 1)) <span class="comment">// similar to x[hi:lo] in verilog</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SEXT(x, len) (&#123; struct &#123; int64_t n : len; &#125; __x = &#123; .n = x &#125;; (uint64_t)__x.n; &#125;)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>BITMASK</code> 生成 <code>bits</code> 掩码<br><code>BITS</code> 切片<br><code>SEXT</code> 进行符号扩展，<code>n</code> 先进行有符号扩展到 64 位，再转换为无符号</p>
+<ul>
+<li>为什么最后要使用无符号数呢？<ul>
+<li>有符号数的溢出是 UB；无符号数会进行 wrap around</li>
+<li>有符号数 <code>&gt;&gt;</code> 随编译器的不同，可能为逻辑右移或者逻辑左移；无符号数无此困扰</li>
+</ul>
+</li>
+</ul>
+<p>定义宏时使用 <code>do &#123;&#125; while (0);</code></p>
+<ul>
+<li>防止展开时出现问题，例如：<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="literal">true</span>)</span><br><span class="line">  MACRO</span><br></pre></td></tr></table></figure>
+如果 <code>MACRO</code> 有多条语句，展开后会出现问题</li>
+</ul>
+]]></content>
+      <categories>
+        <category>ics</category>
+      </categories>
+      <tags>
+        <tag>pa2</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>bitset &amp; UB</title>
+    <url>/2025/01/28/2025-ics-2025-02-01-bitset/</url>
+    <content><![CDATA[<h2 id="bitset"><a href="#bitset" class="headerlink" title="bitset"></a>bitset</h2><h3 id="求无符号数s中1的数量-s"><a href="#求无符号数s中1的数量-s" class="headerlink" title="求无符号数s中1的数量(|s|)"></a>求无符号数s中1的数量(|s|)</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">bitset_size</span><span class="params">(<span class="type">uint32_t</span> s)</span> &#123;</span><br><span class="line">  s = s &amp; <span class="number">0x55555555</span> + (s &gt;&gt; <span class="number">1</span>) &amp; <span class="number">0x55555555</span>;</span><br><span class="line">  s = s &amp; <span class="number">0x33333333</span> + (s &gt;&gt; <span class="number">2</span>) &amp; <span class="number">0x33333333</span>;</span><br><span class="line">  s = s &amp; <span class="number">0x0f0f0f0f</span> + (s &gt;&gt; <span class="number">4</span>) &amp; <span class="number">0x0f0f0f0f</span>;</span><br><span class="line">  s = s &amp; <span class="number">0x00ff00ff</span> + (s &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0x00ff00ff</span>;</span><br><span class="line">  s = s &amp; <span class="number">0x0000ffff</span> + (s &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0x0000ffff</span>;</span><br><span class="line">  <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Lowbit-x-x"><a href="#Lowbit-x-x" class="headerlink" title="Lowbit: x &amp; -x"></a>Lowbit: x &amp; -x</h3><h3 id="求-log-2-x-的整数部分"><a href="#求-log-2-x-的整数部分" class="headerlink" title="求 $\log_2{x}$ 的整数部分"></a>求 $\log_2{x}$ 的整数部分</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">clz</span><span class="params">(<span class="type">uint32_t</span> x)</span> &#123;</span><br><span class="line">  <span class="type">int</span> n = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">if</span> (x &lt;= <span class="number">0x0000ffff</span>) n += <span class="number">16</span>; x &lt;&lt;= <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">if</span> (x &lt;= <span class="number">0x00ffffff</span>) n += <span class="number">8</span>; x &lt;&lt;= <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">if</span> (x &lt;= <span class="number">0x0fffffff</span>) n += <span class="number">4</span>; x &lt;&lt;= <span class="number">4</span>;</span><br><span class="line">  <span class="keyword">if</span> (x &lt;= <span class="number">0x3fffffff</span>) n += <span class="number">2</span>; x &lt;&lt;= <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">if</span> (x &lt;= <span class="number">0x7fffffff</span>) n ++;</span><br><span class="line">  <span class="keyword">return</span> n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>int log2_floor(uint32_t x) {<br>  return 31 - clz(x);<br>}</p>
+<h4 id="若结果就是Lowbit，直接查表"><a href="#若结果就是Lowbit，直接查表" class="headerlink" title="若结果就是Lowbit，直接查表"></a>若结果就是Lowbit，直接查表</h4><h2 id="UB"><a href="#UB" class="headerlink" title="UB"></a>UB</h2><h3 id="常见的-UB："><a href="#常见的-UB：" class="headerlink" title="常见的 UB："></a>常见的 UB：</h3><ul>
+<li>INT_MAX+1; LONG_MAX+1</li>
+<li>CHAR_MAX++;</li>
+<li>1 &lt;&lt; -2</li>
+<li>1 &lt;&lt; 31</li>
+<li>1 &lt;&lt; 32</li>
+<li>1 &#x2F; 0</li>
+<li>INT_MAX % -1</li>
+</ul>
+]]></content>
+      <categories>
+        <category>ics</category>
+      </categories>
+      <tags>
+        <tag>bitset, UB</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nju ics pa1</title>
+    <url>/2025/01/12/2025-ics-2025-01-12-nju-ics-pa1/</url>
+    <content><![CDATA[<h2 id="pa1-1-RTFSC-基础设施"><a href="#pa1-1-RTFSC-基础设施" class="headerlink" title="pa1.1 RTFSC &amp; 基础设施"></a>pa1.1 RTFSC &amp; 基础设施</h2><h3 id="assert-0"><a href="#assert-0" class="headerlink" title="assert(0)"></a>assert(0)</h3><p>找到 <code>assert(0)</code> 并删除即可</p>
+<h3 id="输入-q-时退出不正常"><a href="#输入-q-时退出不正常" class="headerlink" title="输入 q 时退出不正常"></a>输入 q 时退出不正常</h3><p>找到 <code>main</code>: <code>nemu/src/nemu-main.c</code></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">  <span class="comment">/* Initialize the monitor. */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_TARGET_AM</span></span><br><span class="line">  am_init_monitor();</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">  init_monitor(argc, argv);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Start engine. */</span></span><br><span class="line">  engine_start();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> is_exit_status_bad();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>继续寻找 <code>is_exit_status_bad</code>: <code>nemu/src/utils/state.c</code></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">is_exit_status_bad</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="type">int</span> good = (nemu_state.state == NEMU_END &amp;&amp; nemu_state.halt_ret == <span class="number">0</span>) ||</span><br><span class="line">    (nemu_state.state == NEMU_QUIT);</span><br><span class="line">  <span class="keyword">return</span> !good;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>pwndbg</code>（修改Makefile中的 <code>make gdb</code>），发现此时 <code>nemu_state</code> 为 <code>NEMU_STOP</code><br>故修改 <code>cmd_q</code>: <code>nemu/src/monitor/sdb/sdb.c</code></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">cmd_q</span><span class="params">(<span class="type">char</span> *args)</span> &#123;</span><br><span class="line">  nemu_state.state = NEMU_QUIT; <span class="comment">// 添加该行代码，转换state状态为quit</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终退出时不报错</p>
+<h3 id="cmd-si"><a href="#cmd-si" class="headerlink" title="cmd_si"></a>cmd_si</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">cmd_si</span><span class="params">(<span class="type">char</span> *args)</span> &#123;</span><br><span class="line">  <span class="type">uint64_t</span> step = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (args) &#123;</span><br><span class="line">    <span class="built_in">sscanf</span>(args, <span class="string">&quot;%&quot;</span>PRIu64, &amp;step);</span><br><span class="line">  &#125;</span><br><span class="line">  cpu_exec(step);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="cmd-info"><a href="#cmd-info" class="headerlink" title="cmd_info"></a>cmd_info</h3><h4 id="info-r"><a href="#info-r" class="headerlink" title="info r"></a>info r</h4><p>直接调用 <code>nemu/src/isa/$ISA/reg.c</code> 中的 <code>isa_reg_display</code></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">isa_reg_display</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i+=<span class="number">2</span>) &#123;</span><br><span class="line">    <span class="comment">// FMT_WORD 定义在 common.h 中，此处为 &quot;0x%08&quot;PRIx32</span></span><br><span class="line">    <span class="comment">// gpr 定义在 reg.h 中</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\t&quot;</span>FMT_WORD<span class="string">&quot;\t\t&quot;</span>, regs[i], gpr(i));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\t&quot;</span>FMT_WORD<span class="string">&quot;\n&quot;</span>, regs[i+<span class="number">1</span>], gpr(i+<span class="number">1</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="info-w"><a href="#info-w" class="headerlink" title="info w"></a>info w</h4><p>调用 <code>watchpoint.c</code> 中的 <code>wp_display</code></p>
+<h3 id="cmd-x"><a href="#cmd-x" class="headerlink" title="cmd_x"></a>cmd_x</h3><p>扫描内存，解析参数后调用 <code>vaddr_read</code></p>
+<h2 id="pa1-2-表达式求值"><a href="#pa1-2-表达式求值" class="headerlink" title="pa1.2 表达式求值"></a>pa1.2 表达式求值</h2><h3 id="cmd-p"><a href="#cmd-p" class="headerlink" title="cmd_p"></a>cmd_p</h3><p>使用 <code>BNF</code></p>
+<p>! note question</p>
+<ul>
+<li><p>如何保证表达式进行无符号运算?</p>
+<ul>
+<li>生成的数字后添加 u</li>
+</ul>
+</li>
+<li><p>如何随机插入空格?</p>
+<ul>
+<li><code>gen_blank_or_not()</code></li>
+</ul>
+</li>
+<li><p>如何生成长表达式, 同时不会使buf溢出?</p>
+<ul>
+<li><code>表达式长度过长时就只生成数字</code></li>
+<li>TODO：使用 <code>snprintf</code></li>
+</ul>
+</li>
+<li><p>如何过滤求值过程中有除0行为的表达式?</p>
+<ul>
+<li>除 0 时，<code>pclose</code> 的返回值不为 0</li>
+</ul>
+</li>
+<li><p>为什么要使用无符号数</p>
+<ul>
+<li>我们在表达式求值中约定, 所有运算都是无符号运算. 你知道为什么要这样约定吗? 如果进行有符号运算, 有可能会发生什么问题?</li>
+<li>有符号数的溢出是 ub，无符号数溢出会取模</li>
+</ul>
+</li>
+</ul>
+<h2 id="pa1-3-监视点"><a href="#pa1-3-监视点" class="headerlink" title="pa1.3 监视点"></a>pa1.3 监视点</h2><h3 id="cmd-w-cmd-d"><a href="#cmd-w-cmd-d" class="headerlink" title="cmd_w, cmd_d"></a>cmd_w, cmd_d</h3><h4 id="记录监视点，exp-为表达式，value-为旧值"><a href="#记录监视点，exp-为表达式，value-为旧值" class="headerlink" title="记录监视点，exp 为表达式，value 为旧值"></a>记录监视点，<code>exp</code> 为表达式，<code>value</code> 为旧值</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">watchpoint</span> &#123;</span></span><br><span class="line">  <span class="type">int</span> NO;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">watchpoint</span> *<span class="title">next</span>;</span></span><br><span class="line">  <span class="type">char</span> <span class="built_in">exp</span>[<span class="number">32</span>];</span><br><span class="line">  <span class="type">word_t</span> value;</span><br><span class="line">&#125; WP;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> WP* <span class="title function_">new_wp</span><span class="params">()</span> &#123;</span><br><span class="line">  Assert(free_ != <span class="literal">NULL</span>, <span class="string">&quot;Not enough watchpoints.&quot;</span>);</span><br><span class="line">  WP *wp = free_;</span><br><span class="line">  free_ = free_-&gt;next;</span><br><span class="line">  wp-&gt;next = head;</span><br><span class="line">  head = wp;</span><br><span class="line">  <span class="keyword">return</span> head;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">bool</span> <span class="title function_">free_wp</span><span class="params">(WP* wp)</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (head == wp) &#123;</span><br><span class="line">    head = wp-&gt;next;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    WP* cur = head;</span><br><span class="line">    <span class="keyword">while</span> (cur &amp;&amp; cur-&gt;next != wp) </span><br><span class="line">      cur = cur-&gt;next;</span><br><span class="line">    <span class="keyword">if</span> (cur == <span class="literal">NULL</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    cur-&gt;next = wp-&gt;next;</span><br><span class="line">  &#125;</span><br><span class="line">  wp-&gt;next = free_;</span><br><span class="line">  free_ = wp;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_wp</span><span class="params">(<span class="type">char</span>* <span class="built_in">exp</span>, <span class="type">word_t</span> value)</span> &#123;</span><br><span class="line">  WP* wp = new_wp();</span><br><span class="line">  <span class="built_in">strcpy</span>(wp-&gt;<span class="built_in">exp</span>, <span class="built_in">exp</span>);</span><br><span class="line">  wp-&gt;value = value;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Watchpoint %d: %s\n&quot;</span>, wp-&gt;NO, wp-&gt;<span class="built_in">exp</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">delete_wp</span><span class="params">(<span class="type">int</span> no)</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (no &lt; <span class="number">0</span> &amp;&amp; no &gt; <span class="number">32</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  WP* to_delete = &amp;wp_pool[no];</span><br><span class="line">  <span class="keyword">return</span> free_wp(to_delete);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">wp_display</span><span class="params">()</span> &#123;</span><br><span class="line">  WP* cur = head;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;number\texpression\tvalue\n&quot;</span>);</span><br><span class="line">  <span class="keyword">while</span> (cur!=<span class="literal">NULL</span>) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%-6d\t%-10s\t&quot;</span> FMT_WORD <span class="string">&quot;\n&quot;</span>, cur-&gt;NO, cur-&gt;<span class="built_in">exp</span>, cur-&gt;value);</span><br><span class="line">    cur = cur-&gt;next;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">wp_check</span><span class="params">()</span> &#123;</span><br><span class="line">  WP* cur = head;</span><br><span class="line">  <span class="keyword">while</span> (cur) &#123;</span><br><span class="line">    <span class="type">bool</span> success;</span><br><span class="line">    <span class="type">word_t</span> new_value = expr(cur-&gt;<span class="built_in">exp</span>, &amp;success);</span><br><span class="line">    <span class="keyword">if</span> (new_value != cur-&gt;value) &#123;</span><br><span class="line">      nemu_state.state = NEMU_STOP;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;number\t%-*s\told value\tnew value\tpc\n&quot;</span></span><br><span class="line">              <span class="string">&quot;%-6d\t%-10s\t&quot;</span> FMT_WORD <span class="string">&quot;\t&quot;</span> FMT_WORD <span class="string">&quot;\t&quot;</span> FMT_WORD <span class="string">&quot;\n&quot;</span>, </span><br><span class="line">              (<span class="type">int</span>)<span class="built_in">strlen</span>(cur-&gt;<span class="built_in">exp</span>), <span class="string">&quot;expression&quot;</span>, cur-&gt;NO, cur-&gt;<span class="built_in">exp</span>, cur-&gt;value, new_value, isa_reg_str2val(<span class="string">&quot;pc&quot;</span>, <span class="literal">NULL</span>));</span><br><span class="line">      cur-&gt;value = new_value;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cur = cur-&gt;next;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改-Kconfig，模仿-DIFFTEST，写出-WATCHPOINT-的设置"><a href="#修改-Kconfig，模仿-DIFFTEST，写出-WATCHPOINT-的设置" class="headerlink" title="修改 Kconfig，模仿 DIFFTEST，写出 WATCHPOINT 的设置"></a>修改 <code>Kconfig</code>，模仿 <code>DIFFTEST</code>，写出 <code>WATCHPOINT</code> 的设置</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">config DIFFTEST</span><br><span class="line">  depends on TARGET_NATIVE_ELF</span><br><span class="line">  bool &quot;Enable differential testing&quot;</span><br><span class="line">  default n</span><br><span class="line">  help</span><br><span class="line">    Enable differential testing with a reference design.</span><br><span class="line">    Note that this will significantly reduce the performance of NEMU.</span><br><span class="line"></span><br><span class="line">config WATCHPOINT</span><br><span class="line">  bool &quot;Enable watchpoint&quot;</span><br><span class="line">  default n</span><br><span class="line">  help</span><br><span class="line">    Enable watchpoint.</span><br><span class="line">    Note that this will significantly reduce the performance of NEMU.</span><br></pre></td></tr></table></figure>
+
+<p>同时在 <code>trace_and_difftest</code> 最后加上 <code>IFDEF(CONFIG_WATCHPOINT, wp_check());</code></p>
+<h4 id="修改-isa-str2val，返回相应寄存器（包括pc）的值"><a href="#修改-isa-str2val，返回相应寄存器（包括pc）的值" class="headerlink" title="修改 isa_str2val，返回相应寄存器（包括pc）的值"></a>修改 <code>isa_str2val</code>，返回相应寄存器（包括pc）的值</h4>]]></content>
+      <categories>
+        <category>ics</category>
+      </categories>
+      <tags>
+        <tag>pa1</tag>
       </tags>
   </entry>
 </search>
