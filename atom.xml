@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>kaifeng&#39;s blog</title>
+  
+  <subtitle>Rhodes Island</subtitle>
+  <link href="http://www.kaifeng.click/atom.xml" rel="self"/>
+  
+  <link href="http://www.kaifeng.click/"/>
+  <updated>2025-04-14T15:00:09.333Z</updated>
+  <id>http://www.kaifeng.click/</id>
+  
+  <author>
+    <name>kaifeng</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>test</title>
+    <link href="http://www.kaifeng.click/2025/04/14/test/"/>
+    <id>http://www.kaifeng.click/2025/04/14/test/</id>
+    <published>2025-04-14T12:39:05.000Z</published>
+    <updated>2025-04-14T15:00:09.333Z</updated>
+    
+    <content type="html"><![CDATA[<p>测试文档</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;hello world&quot;</span>)<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">这是测试</summary>
+    
+    
+    
+    <category term="test" scheme="http://www.kaifeng.click/categories/test/"/>
+    
+    
+    <category term="test" scheme="http://www.kaifeng.click/tags/test/"/>
+    
+  </entry>
+  
+</feed>
