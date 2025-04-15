@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>test</title>
-      <link href="/2025/04/14/test/"/>
-      <url>/2025/04/14/test/</url>
+      <title>测试</title>
+      <link href="/2025/04/test/"/>
+      <url>/2025/04/test/</url>
       
-        <content type="html"><![CDATA[<p>测试文档</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;hello world&quot;</span>)<br></code></pre></td></tr></table></figure>]]></content>
+        <content type="html"><![CDATA[<h2 id="测试文档"><a href="#测试文档" class="headerlink" title="测试文档"></a>测试文档</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;hello world&quot;</span>)<br></code></pre></td></tr></table></figure><p><img src="/images/test/ark1.png" alt="图片"></p><div class="note note-success">            <p>标签</p>          </div><span class="label label-primary">行内标签</span>    <div class="fold">      <div class="fold-title fold-info collapsed" data-toggle="collapse" href="#collapse-c26d45a8" role="button" aria-expanded="false" aria-controls="collapse-c26d45a8">        <div class="fold-arrow">▶</div>折叠      </div>      <div class="fold-collapse collapse" id="collapse-c26d45a8">        <div class="fold-content">          <p>什么都没有</p>        </div>      </div>    </div><a class="btn" href="https://www.kaifeng.click"  title="hover" target="_blank">按钮</a><div class="group-image-container"><div class="group-image-row"><div class="group-image-wrap"><img src="/images/background/endfield_bg1.jpg"></div><div class="group-image-wrap"><img src="/images/background/endfield_bg4.jpg"></div></div><div class="group-image-row"><div class="group-image-wrap"><img src="/images/background/endfield_bg3.jpg"></div><div class="group-image-wrap"><img src="/images/background/endfield_bg2.jpg"></div><div class="group-image-wrap"><img src="/images/background/endfield_bg5.jpg"></div></div></div>]]></content>
       
       
       <categories>
