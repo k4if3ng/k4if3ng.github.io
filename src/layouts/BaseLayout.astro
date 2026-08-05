@@ -1,0 +1,176 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { avatarUrl, site, socials } from '../config';
+import PreferenceControls from '../components/PreferenceControls.astro';
+import { localeMeta, localizePath, t, type Locale } from '../i18n/ui';
+
+interface Props { title?: string; description?: string; locale?: Locale; hasTranslation?: boolean; alternateHref?: string | null; }
+const locale = Astro.props.locale ?? (Astro.url.pathname === '/en' || Astro.url.pathname.startsWith('/en/') ? 'en' : 'zh');
+const localizedSite = site.locales[locale];
+const { title, description = localizedSite.description, hasTranslation = true, alternateHref } = Astro.props;
+const localizedSiteTitle = localizedSite.title;
+const pageTitle = title ? `${title} | ${localizedSiteTitle}` : localizedSiteTitle;
+const path = Astro.url.pathname;
+const prefix = localeMeta[locale].prefix;
+const alternateLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+const translationHref = hasTranslation ? (alternateHref ?? localizePath(path, alternateLocale)) : null;
+const nav = [
+  { href: `${prefix}/`, label: t(locale, 'nav.home') },
+  { href: `${prefix}/archive/`, label: t(locale, 'nav.archive') },
+  { href: `${prefix}/projects/`, label: t(locale, 'nav.projects') },
+  { href: `${prefix}/about/`, label: t(locale, 'nav.about') },
+];
+const isActive = (href: string) => href === '/' || href === '/en/' ? path === href : path.startsWith(href);
+const canonicalUrl = new URL(path, site.url);
+const alternateUrl = translationHref ? new URL(translationHref, site.url) : null;
+const siteStartYear = 2025;
+const currentYear = new Date().getFullYear();
+const siteYearLabel = currentYear > siteStartYear ? `${siteStartYear}-${currentYear}` : `${siteStartYear}`;
+---
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#003153" />
+    <link rel="icon" href="/images/favicon.svg" />
+    <link rel="canonical" href={canonicalUrl} />
+    {alternateUrl && <><link rel="alternate" hreflang={localeMeta[locale].htmlLang} href={canonicalUrl} /><link rel="alternate" hreflang={localeMeta[alternateLocale].htmlLang} href={alternateUrl} /><link rel="alternate" hreflang="x-default" href={locale === 'zh' ? canonicalUrl : alternateUrl} /></>}
+    <link rel="alternate" type="application/rss+xml" title={localizedSite.title} href={`${prefix}/rss.xml`} />
+    <title>{pageTitle}</title>
+    <ClientRouter />
+    <script is:inline>
+      (() => {
+        const preference = localStorage.getItem('theme') || 'system';
+        const resolved = preference === 'system'
+          ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : preference;
+        document.documentElement.dataset.themePreference = preference;
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.dataset.locale = document.documentElement.lang === 'en' ? 'en' : 'zh';
+      })();
+    </script>
+  </head>
+  <body transition:animate="none">
+    <header class="mobile-bar" transition:name="mobile-bar">
+      <a class="brand" href={`${prefix}/`}>k4if3ng<small>{t(locale, 'brand.subtitle')}</small></a>
+      <nav aria-label={t(locale, 'a11y.mobileNav')}>
+        {nav.map(item => <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>)}
+      </nav>
+      <PreferenceControls locale={locale} translationHref={translationHref} />
+    </header>
+    <section class="shell mobile-profile" aria-label={site.name} transition:name="mobile-profile">
+      <a class="mobile-identity" href={`${prefix}/`}>
+        <img class="mobile-avatar" src={avatarUrl} width="56" height="56" alt={t(locale, 'a11y.avatar', { name: site.name })} />
+        <span class="mobile-identity-text">
+          <strong>凯风</strong>
+          <small>Kaifeng</small>
+        </span>
+      </a>
+      <p class="mobile-motto">{localizedSite.motto}</p>
+    </section>
+    <div class="shell app">
+      <aside class="sidebar" transition:name="site-sidebar">
+        <a class="identity" href={`${prefix}/`}>
+          <img class="avatar" src={avatarUrl} width="84" height="84" alt={t(locale, 'a11y.avatar', { name: site.name })} />
+          <span class="identity-name"><strong>凯风</strong><small>Kaifeng</small></span>
+        </a>
+        <div class="site-kind">{localizedSite.motto}</div>
+        <nav class="nav" aria-label={t(locale, 'a11y.mainNav')}>
+          {nav.map(item => <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>)}
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="socials" aria-label={t(locale, 'a11y.social')}>
+            {socials.filter(item => item.href).map(item =>
+              <a href={item.href} target={item.target} rel={item.target ? 'noreferrer' : undefined} aria-label={item.label} data-link-plain><span class="social-icon" style={`--icon: url('${item.icon}')`}></span></a>
+            )}
+          </div>
+          <PreferenceControls locale={locale} translationHref={translationHref} />
+        </div>
+      </aside>
+      <div class="layout-divider" aria-hidden="true" transition:name="site-divider"></div>
+      <main class="main" transition:name="site-main">
+        <slot />
+        <section class="mobile-social-card" aria-label={t(locale, 'a11y.social')}>
+          <div class="mobile-social-copy"><div class="eyebrow">{t(locale, 'social.mobileEyebrow')}</div><strong>{t(locale, 'social.mobileTitle')}</strong></div>
+          <div class="socials mobile-socials">
+            {socials.filter(item => item.href).map(item =>
+              <a href={item.href} target={item.target} rel={item.target ? 'noreferrer' : undefined} aria-label={item.label} data-link-plain><span class="social-icon" style={`--icon: url('${item.icon}')`}></span></a>
+            )}
+          </div>
+        </section>
+        <footer class="footer">© {siteYearLabel} {site.name} · {t(locale, 'footer.built')}</footer>
+      </main>
+    </div>
+    <script is:inline>
+      const media = matchMedia('(prefers-color-scheme: dark)');
+      const applyTheme = (preference) => {
+        const resolved = preference === 'system' ? (media.matches ? 'dark' : 'light') : preference;
+        document.documentElement.dataset.themePreference = preference;
+        document.documentElement.dataset.theme = resolved;
+      };
+      const updateThemeControls = (preference) => {
+        document.querySelectorAll('[data-theme-current-icon]').forEach((themeIcon) => {
+          const activeOption = [...document.querySelectorAll('[data-theme-option]')].find((option) => option.dataset.themeOption === preference);
+          const icon = activeOption?.dataset.themeSymbol || '◐';
+          themeIcon.textContent = icon;
+        });
+        document.querySelectorAll('[data-theme-option]').forEach((option) => {
+          const active = option.dataset.themeOption === preference;
+          option.setAttribute('aria-checked', String(active));
+          const check = option.querySelector('[data-theme-check]');
+          if (check) check.hidden = !active;
+        });
+      };
+      const syncTheme = () => {
+        const preference = localStorage.getItem('theme') || 'system';
+        applyTheme(preference);
+        updateThemeControls(preference);
+      };
+      if (!window.__kaifengThemeController) {
+        document.addEventListener('click', (event) => {
+          const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+          document.querySelectorAll('.control-menu[open]').forEach((menu) => {
+            if (!target?.closest('.control-menu') || !menu.contains(target)) menu.removeAttribute('open');
+          });
+          const option = target?.closest('[data-theme-option]');
+          if (!option) return;
+          const preference = option.dataset.themeOption || 'system';
+          localStorage.setItem('theme', preference);
+          applyTheme(preference);
+          updateThemeControls(preference);
+          option.closest('details')?.removeAttribute('open');
+        });
+        window.__kaifengThemeController = true;
+      }
+      document.addEventListener('astro:after-swap', syncTheme);
+      document.addEventListener('astro:page-load', syncTheme);
+      syncTheme();
+      media.addEventListener('change', () => {
+        if ((document.documentElement.dataset.themePreference || 'system') === 'system') {
+          applyTheme('system');
+          updateThemeControls('system');
+        }
+      });
+      const decorateContentLinks = () => document.querySelectorAll('main a[href]').forEach((link) => {
+        if (link.hasAttribute('data-link-plain') || link.closest('[data-link-card]')) return;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#')) return;
+        const target = new URL(href, location.href);
+        link.classList.add('content-link');
+        if (target.origin === location.origin) {
+          link.classList.add('link-internal');
+        } else {
+          link.classList.add('link-external');
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noreferrer');
+        }
+      });
+      document.addEventListener('astro:page-load', decorateContentLinks);
+      decorateContentLinks();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getPostExcerpt, getPostPath } from '../lib/posts';
+import type { Locale } from '../i18n/ui';
+import { formatDate } from '../i18n/formatters';
+interface Props { posts: CollectionEntry<'posts'>[]; locale: Locale; }
+const { posts, locale } = Astro.props;
+---
+<div class="post-list">
+  {posts.map(post => (
+    <a class="post-card" href={getPostPath(post)} data-link-card>
+      <div>
+        <h3>{post.data.title}</h3>
+        {getPostExcerpt(post) && <p>{getPostExcerpt(post)}</p>}
+        <div class="tags"><time class="post-date" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale, { year: 'numeric', month: '2-digit', day: '2-digit' })}</time>{post.data.tags.map(tag => <span class="tag">#{tag}</span>)}</div>
+      </div>
+      <span class="entry-arrow entry-arrow-internal" aria-hidden="true"></span>
+    </a>
+  ))}
+</div>

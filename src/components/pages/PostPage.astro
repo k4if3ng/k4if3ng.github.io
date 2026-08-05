@@ -1,0 +1,96 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPostExcerpt, getPostPath, getPostTranslations } from '../../lib/posts';
+import { t, type Locale } from '../../i18n/ui';
+import { formatDate } from '../../i18n/formatters';
+interface Props { post: CollectionEntry<'posts'>; older?: CollectionEntry<'posts'>; newer?: CollectionEntry<'posts'>; }
+const { post, older, newer } = Astro.props;
+const locale: Locale = post.data.lang;
+const { Content, headings } = await render(post);
+const toc = headings.filter(({ depth }) => depth === 2 || depth === 3);
+const plainText = (post.body ?? '').replace(/```[\s\S]*?```/g, ' ').replace(/<[^>]+>/g, ' ').replace(/[#>*_~`\[\]()-]/g, ' ');
+const cjkCount = (plainText.match(/[\u3400-\u9fff\u3040-\u30ff]/g) ?? []).length;
+const latinCount = (plainText.match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g) ?? []).length;
+const wordCount = cjkCount + latinCount;
+const readingMinutes = Math.max(1, Math.ceil(cjkCount / 300 + latinCount / 200));
+const excerpt = getPostExcerpt(post);
+const translations = await getPostTranslations(post);
+const alternateLocale: Locale = locale === 'zh' ? 'en' : 'zh';
+const alternate = translations[alternateLocale];
+const copyLabel = t(locale, 'post.copy');
+const copySuccess = t(locale, 'post.copySuccess');
+const copyFailed = t(locale, 'post.copyFailed');
+---
+<BaseLayout locale={locale} title={post.data.title} description={excerpt} hasTranslation={Boolean(alternate)} alternateHref={alternate ? getPostPath(alternate) : null}>
+  <header class="page-header article-header" id="article-top">
+    <div class="eyebrow">{t(locale, 'post.eyebrow', { tag: post.data.tags[0] ?? 'note' })}</div>
+    <h1 class="page-title">{post.data.title}</h1>
+    <div class="article-meta"><time class="article-meta-date" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale, { dateStyle: 'long' })}</time><span class="article-meta-stat">{t(locale, 'post.words', { count: wordCount })}</span><span class="article-meta-stat">{t(locale, 'post.reading', { count: readingMinutes })}</span>{post.data.tags.map(tag => <span class="article-tag">#{tag}</span>)}</div>
+  </header>
+  {toc.length > 0 && <aside class="reading-toc" aria-label={t(locale, 'post.toolbarAria')}>
+    <details open>
+      <summary><span class="toc-label">{t(locale, 'post.toc')}</span><span class="toc-current" data-toc-current>{toc[0]?.text}</span></summary>
+      <div class="toc-panel"><div class="toc-panel-inner"><ol>{toc.map(heading => <li class={`toc-depth-${heading.depth}`}><a href={`#${heading.slug}`} data-toc-link={heading.slug}>{heading.text}</a></li>)}</ol></div></div>
+    </details>
+  </aside>}
+  <article class="prose"><Content /></article>
+  <nav class="post-pagination" aria-label={t(locale, 'post.paginationAria')}>
+    {older ? <a href={getPostPath(older)} data-link-card><small><span class="entry-arrow entry-arrow-internal-back" aria-hidden="true"></span><span>{t(locale, 'post.previous')}</span></small><strong>{older.data.title}</strong></a> : <span></span>}
+    {newer ? <a href={getPostPath(newer)} data-link-card><small><span>{t(locale, 'post.next')}</span><span class="entry-arrow entry-arrow-internal" aria-hidden="true"></span></small><strong>{newer.data.title}</strong></a> : <span></span>}
+  </nav>
+  <script is:inline define:vars={{ copyLabel, copySuccess, copyFailed }}>
+    const initPostPage = () => {
+      const tocLinks = [...document.querySelectorAll('[data-toc-link]')];
+      const articleHeadings = [...document.querySelectorAll('.prose h2[id], .prose h3[id]')];
+      const tocPanel = document.querySelector('.reading-toc details');
+      const tocCurrent = document.querySelector('[data-toc-current]');
+      const mobileToc = matchMedia('(max-width: 780px)');
+      if (mobileToc.matches) tocPanel?.removeAttribute('open');
+      if (tocLinks.length && articleHeadings.length) {
+        const setActiveHeading = (id) => tocLinks.forEach((link) => {
+          const active = link.dataset.tocLink === id;
+          link.classList.toggle('is-active', active);
+          active ? link.setAttribute('aria-current', 'location') : link.removeAttribute('aria-current');
+          if (active && tocCurrent) tocCurrent.textContent = link.textContent;
+        });
+        const observer = new IntersectionObserver((entries) => {
+          const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          if (visible[0]) setActiveHeading(visible[0].target.id);
+        }, { rootMargin: '-88px 0px -68% 0px', threshold: [0, 1] });
+        articleHeadings.forEach(heading => observer.observe(heading));
+        tocLinks.forEach(link => link.addEventListener('click', () => { if (mobileToc.matches) tocPanel?.removeAttribute('open'); }));
+        setActiveHeading(articleHeadings[0].id);
+      }
+      document.querySelectorAll('[data-code-copy]').forEach((button) => {
+        if (button.dataset.copyBound === 'true') return;
+        const block = button.closest('.code-block');
+        const code = block?.querySelector('pre code');
+        const language = block?.dataset.lang || 'text';
+        button.dataset.copyBound = 'true';
+        button.disabled = false;
+        button.setAttribute('aria-label', `${copyLabel}: ${language}`);
+        button.setAttribute('title', `${copyLabel}: ${language}`);
+        button.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(code?.textContent ?? '');
+            button.dataset.state = 'copied';
+            button.setAttribute('aria-label', copySuccess);
+            button.setAttribute('title', copySuccess);
+            window.setTimeout(() => {
+              button.dataset.state = 'idle';
+              button.setAttribute('aria-label', `${copyLabel}: ${language}`);
+              button.setAttribute('title', `${copyLabel}: ${language}`);
+            }, 1200);
+          } catch {
+            button.setAttribute('aria-label', copyFailed);
+            button.setAttribute('title', copyFailed);
+          }
+        });
+      });
+    };
+    document.addEventListener('astro:page-load', initPostPage);
+    initPostPage();
+  </script>
+</BaseLayout>

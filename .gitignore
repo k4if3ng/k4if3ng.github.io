@@ -1,0 +1,38 @@
+node_modules/
+.pnpm-store/
+
+# Astro and deployment output
+dist/
+.astro/
+.vercel/
+.netlify/
+.output/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Caches and coverage
+.cache/
+.temp/
+.tmp/
+.vite/
+coverage/
+.nyc_output/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor files
+.idea/
+*.swp
+*.swo

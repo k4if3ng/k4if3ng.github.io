@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { localeMeta, t, type Locale } from '../../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+<BaseLayout locale={locale} title={t(locale, 'notFound.title')}>
+  <header class="page-header"><div class="eyebrow">{t(locale, 'notFound.eyebrow')}</div><h1 class="page-title">{t(locale, 'notFound.heading')}</h1><p>{t(locale, 'notFound.body')}</p></header>
+  <div class="section"><a class="text-link link-internal-back" href={`${localeMeta[locale].prefix}/`} data-link-plain><span class="entry-arrow entry-arrow-internal-back" aria-hidden="true"></span>{t(locale, 'notFound.back')}</a></div>
+</BaseLayout>

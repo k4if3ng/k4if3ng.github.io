@@ -1,0 +1,22 @@
+---
+import { t, type Locale } from '../i18n/ui';
+import { themeOptions } from '../config/theme';
+
+interface Props { locale: Locale; translationHref?: string | null; }
+const { locale, translationHref } = Astro.props;
+---
+<div class="quick-controls preference-controls">
+  {translationHref
+    ? <a class="quick-control language-switch" href={translationHref} data-link-plain aria-label={t(locale, 'language.switch')}>{locale === 'zh' ? 'EN' : '中'}</a>
+    : <span class="quick-control language-switch is-disabled" aria-label={t(locale, 'language.current')}>{locale === 'zh' ? 'EN' : '中'}</span>}
+  <details class="control-menu theme-menu">
+    <summary class="quick-control theme-toggle" aria-label={t(locale, 'theme.change')}>
+      <span data-theme-current-icon aria-hidden="true">◐</span>
+    </summary>
+    <div class="control-popover theme-popover" role="menu">
+      {themeOptions.map(option => <button class="theme-option" type="button" data-theme-option={option.value} data-theme-symbol={option.icon} role="menuitemradio" aria-checked="false">
+        <span class="theme-option-icon" aria-hidden="true">{option.icon}</span><span>{t(locale, option.labelKey)}</span><span class="menu-check" data-theme-check aria-hidden="true" hidden>✓</span>
+      </button>)}
+    </div>
+  </details>
+</div>

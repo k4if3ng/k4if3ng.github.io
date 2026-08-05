@@ -1,0 +1,8 @@
+---
+import PostPage from '../../../components/pages/PostPage.astro';
+import { getPostStaticPaths } from '../../../lib/posts';
+export async function getStaticPaths() { return getPostStaticPaths('en'); }
+const { post, redirectTo, older, newer } = Astro.props;
+if (redirectTo) return Astro.redirect(redirectTo, 301);
+---
+<PostPage post={post} older={older} newer={newer} />

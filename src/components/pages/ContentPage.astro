@@ -1,0 +1,16 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { Locale } from '../../i18n/ui';
+
+interface Props { locale: Locale; pageKey: string; }
+const { locale, pageKey } = Astro.props;
+const entries = await getCollection('pages', ({ data }) => data.pageKey === pageKey && data.lang === locale);
+if (entries.length !== 1) throw new Error(`Expected exactly one ${locale} ${pageKey} page, found ${entries.length}.`);
+const page = entries[0];
+const { Content } = await render(page);
+---
+<BaseLayout locale={locale} title={page.data.title} description={page.data.description}>
+  <header class="page-header"><div class="eyebrow">{pageKey}</div><h1 class="page-title">{page.data.title}</h1><p>{page.data.description}</p></header>
+  <article class="prose"><Content /></article>
+</BaseLayout>

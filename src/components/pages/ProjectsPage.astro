@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getProjects } from '../../lib/projects';
+import { t, type Locale } from '../../i18n/ui';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const projects = await getProjects(locale);
+---
+<BaseLayout locale={locale} title={t(locale, 'projects.title')}>
+  <header class="page-header compact-header"><div><div class="eyebrow">{t(locale, 'projects.eyebrow')}</div><h1 class="page-title">{t(locale, 'projects.title')}</h1></div><p>{t(locale, 'projects.subtitle')}</p></header>
+  <div class="projects-grid">
+    {projects.map((project, index) => <a class="project-entry project-entry-external" href={project.data.href} target="_blank" rel="noreferrer" data-link-card>
+      <div class="project-number">{String(index + 1).padStart(2, '0')}</div>
+      <div class="project-content"><div class="project-heading"><h2>{project.data.name}</h2><span class="project-status">{project.data.status}</span></div><p>{project.data.description}</p><div class="project-meta">{project.data.stack.map(item => <span class="project-tag">#{item}</span>)}</div></div>
+      <span class="project-media">{project.data.image && <span class="project-image"><img src={project.data.image.src} width={project.data.image.width} height={project.data.image.height} alt={t(locale, 'projects.imageAlt', { name: project.data.name })} /></span>}<span class="entry-arrow entry-arrow-external" aria-hidden="true"></span></span>
+    </a>)}
+  </div>
+</BaseLayout>

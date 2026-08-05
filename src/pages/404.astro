@@ -1,0 +1,5 @@
+---
+import NotFoundPage from '../components/pages/NotFoundPage.astro';
+---
+<NotFoundPage locale="zh" />
+<script is:inline>if (location.pathname.startsWith('/en/') && location.pathname !== '/en/404/') location.replace('/en/404/');</script>

@@ -1,0 +1,30 @@
+{
+  "name": "k4if3ng-homepage",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "pnpm run dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "help": "node scripts/site.mjs help",
+    "new:post": "node scripts/new-content.mjs post",
+    "new:project": "node scripts/new-content.mjs project",
+    "new:page": "node scripts/new-content.mjs page",
+    "deploy": "node scripts/site.mjs deploy"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "@astrojs/sitemap": "^3.4.2",
+    "astro": "^5.12.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@iconify-json/logos": "^1.2.12",
+    "@iconify-json/simple-icons": "^1.2.93",
+    "typescript": "^5.8.3"
+  }
+}
