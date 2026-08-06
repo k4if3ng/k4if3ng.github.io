@@ -1,8 +1,7 @@
 ---
-pageKey: about
 lang: en
 title: About
-eyebrow: About
+kicker: About
 emptyState: There is nothing more to share for now.
 ---
 

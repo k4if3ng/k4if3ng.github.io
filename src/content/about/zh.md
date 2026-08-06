@@ -1,8 +1,7 @@
 ---
-pageKey: about
 lang: zh
 title: 关于
-eyebrow: About
+kicker: About
 emptyState: 暂时还没有更多可以透露的内容。
 ---
 

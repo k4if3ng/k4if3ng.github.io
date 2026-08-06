@@ -49,8 +49,8 @@ const templates = type === 'post'
       zh: `---\nname: "TODO：项目名称"\nlang: zh\ntranslationKey: ${slug}\ndescription: "TODO：一句话介绍项目。"\nhref: https://example.com/${slug}\nstatus: 草稿\norder: 999\ndraft: true\n# stack: [Astro, TypeScript]\n# image: ./assets/cover.webp\n---\n\n在这里记录项目的中文背景、目标和进展。发布前填写真实链接，并将 \`draft\` 改为 \`false\`。\n`,
       en: `---\nname: "TODO: Project name"\nlang: en\ntranslationKey: ${slug}\ndescription: "TODO: Describe the project in one sentence."\nhref: https://example.com/${slug}\nstatus: Draft\norder: 999\ndraft: true\n# stack: [Astro, TypeScript]\n# image: ./assets/cover.webp\n---\n\nDocument the English background, goals, and progress here. Add the real link and change \`draft\` to \`false\` before publishing.\n`,
     } : {
-      zh: `---\npageKey: ${slug}\nlang: zh\ntitle: "TODO：页面标题"\n---\n\n在这里开始写页面正文。\n`,
-      en: `---\npageKey: ${slug}\nlang: en\ntitle: "TODO: Page title"\n---\n\nStart writing the page here.\n`,
+      zh: `---\nlang: zh\ntitle: "TODO：页面标题"\n---\n\n在这里开始写页面正文。\n`,
+      en: `---\nlang: en\ntitle: "TODO: Page title"\n---\n\nStart writing the page here.\n`,
     };
 
 const plannedFiles = [...files, ...routeFiles];
@@ -69,8 +69,8 @@ const generated = [
   [files[0], templates.zh],
   [files[1], templates.en],
   ...(type === 'page' ? [
-    [routeFiles[0], `---\nimport ContentPage from '../components/pages/ContentPage.astro';\n---\n<ContentPage locale="zh" pageKey="${slug}" />\n`],
-    [routeFiles[1], `---\nimport ContentPage from '../../components/pages/ContentPage.astro';\n---\n<ContentPage locale="en" pageKey="${slug}" />\n`],
+    [routeFiles[0], `---\nimport ContentPage from '../components/pages/ContentPage.astro';\n---\n<ContentPage locale="zh" contentKey="${slug}" />\n`],
+    [routeFiles[1], `---\nimport ContentPage from '../../components/pages/ContentPage.astro';\n---\n<ContentPage locale="en" contentKey="${slug}" />\n`],
   ] : []),
 ];
 await Promise.all(generated.map(([file, content]) => writeFile(file, content, 'utf8')));

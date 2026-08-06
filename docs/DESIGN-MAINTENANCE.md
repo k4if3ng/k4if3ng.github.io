@@ -19,7 +19,7 @@
 | `src/lib/posts.ts` | 按语言查询 note、翻译配对、静态路径、canonical URL 与正文摘要 |
 | `src/lib/projects.ts` | 按语言读取并排序 project 内容 |
 | `src/lib/pages.ts` | 按 page key 和语言读取页面文案 |
-| `src/content/home/en.md`、`src/content/home/zh.md` | 首页 title、Markdown hero、motto 和首页分区文案 |
+| `src/content/home/en.md`、`src/content/home/zh.md` | 首页 title、heroTitle、kicker、Markdown hero 和首页分区文案 |
 | `src/content/<page-key>/` | 必须双语的 About、Projects、Friends 等页面级 Markdown 与 assets |
 | `src/content/projects/<project-key>/` | 中英文 project 实体 Markdown 与 assets；`projects/en.md`、`projects/zh.md` 另用于项目页文案 |
 | `scripts/new-content.mjs` | 创建中英文 post／project 草稿的本地脚手架 |
@@ -95,7 +95,7 @@
 
 ## 3. 站点、社媒与项目
 
-`src/config.ts` 只维护稳定的站点身份、地址和社媒配置。首页及页面级可编辑文案进入 Content Collection：`src/content/home/{zh,en}.md` 维护首页 title、kicker、lead、Markdown 正文、motto 和分区标题；`src/content/<page-key>/{zh,en}.md` 维护其他页面的标题，Archive 页面文案位于 `src/content/posts/{zh,en}.md`。所有页面都不再维护独立的 description 字段；布局通过 `getPage()` 读取标题和正文，不再从 `config.ts` 或 `ui.ts` 复制这些文案。
+`src/config.ts` 维护稳定的站点身份、localized site name、motto、footer 配置、地址和社媒配置。页面级可编辑文案进入 Content Collection：`src/content/<content-key>/{zh,en}.md` 以所在文件夹作为唯一 content key；`src/content/home/{zh,en}.md` 维护首页 title、heroTitle、kicker、lead、Markdown 正文和分区标题，Archive 页面文案位于 `src/content/posts/{zh,en}.md`。所有页面都不再维护独立的 description 字段；布局通过文件路径读取页面内容，页面 `title` 用于页面大标题、导航和浏览器标题短标题，首页 `heroTitle` 单独控制首页大标题，站点级名称、motto 和 RSS 标题使用 `config.ts` 中的站点配置。
 
 ### 社媒
 
@@ -170,7 +170,7 @@ src/content/
     └── <post-key>/       # 文章实体与 assets
 ```
 
-这些页面文件使用 `pageKey`、`lang`、`title`、`emptyState` 等 frontmatter 字段；首页额外使用 `kicker` 和 `lead` metadata，页面组件负责输出首页头部，description 类介绍文字直接写在 Markdown 正文中，仍可继续加入链接、强调、段落和图片；`motto`、动态列表标题和 Archive 搜索提示等仍保留在 frontmatter，供布局和动态组件读取。`src/lib/pages.ts` 的 `getPage(pageKey, locale)` 负责按页面和语言读取唯一内容。
+这些页面文件使用 `lang`、`title`、`kicker`、`emptyState` 等 frontmatter 字段；首页额外使用 `heroTitle`、`kicker` 和 `lead` metadata，页面组件负责输出首页头部，description 类介绍文字直接写在 Markdown 正文中，仍可继续加入链接、强调、段落和图片；动态列表标题和 Archive 搜索提示等保留在相应页面 metadata，供布局和动态组件读取。`motto` 属于站点级配置，统一维护在 `src/config.ts`，通过多行字符串支持手动换行。`src/lib/pages.ts` 的 `getPage(contentKey, locale)` 根据文件路径 `<contentKey>/<locale>.md` 读取唯一内容，`posts` 页面内容因此直接对应 `src/content/posts/{zh,en}.md`。
 
 `src/i18n/ui.ts` 只保留导航、按钮、tooltip、ARIA、搜索和动态数量等交互性短文案。比如“记录代码、设计，以及仍在生长的想法。”、“项目”、“一些正在生长的作品与实验。”以及各页面空状态，都应分别编辑对应 Markdown，不需要修改 TypeScript。
 
@@ -209,7 +209,7 @@ src/pages/en/friends.astro
 
 1. 优先运行 `pnpm new:page -- friends`；它会创建 `src/content/friends/` 内容目录和中英文路由入口。
 2. 通用文字页面使用 `ContentPage.astro`，不再为每一页复制查询与排版逻辑；只有特殊视觉结构才新建专用页面组件。
-3. 如果页面要进入主导航，修改 `src/layouts/BaseLayout.astro` 的 `nav` 数组，并在 `src/i18n/ui.ts` 添加导航文案。
+3. 如果页面要进入主导航，确保对应页面 metadata 的 `title` 已填写；主导航会从页面路径对应的 `title` 自动生成。
 4. 如果它只是旧链接兼容入口，可以保留独立 redirect；真正启用页面时再改为 `ContentPage` 路由。
 
 文章、项目和普通页面的职责保持分开：可增长的正文与页面文案放 `src/content/`，页面骨架放 `src/components/pages/`，URL 入口放 `src/pages/`。`ui.ts` 只保留导航、按钮、tooltip、ARIA、搜索和空状态等交互性短文案。

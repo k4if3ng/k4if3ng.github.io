@@ -41,7 +41,7 @@ const projects = defineCollection({
 });
 
 const pages = defineCollection({
-  // Page copy lives at src/content/home/{en,zh}.md or src/content/<page-key>/{en,zh}.md.
+  // Page copy is identified by its path: src/content/<page-key>/{en,zh}.md.
   // Posts and project entities use their own schemas and are excluded here.
   loader: glob({
     base: './src/content',
@@ -49,22 +49,20 @@ const pages = defineCollection({
     generateId: markdownEntryId,
   }),
   schema: z.object({
-    pageKey: z.string(),
     lang: z.enum(['zh', 'en']),
-    title: z.string(),
+    title: z.string().default(''),
+    heroTitle: z.string().default(''),
     kicker: z.string().default(''),
     lead: z.string().default(''),
-    eyebrow: z.string().default(''),
-    recentEyebrow: z.string().default(''),
+    recentKicker: z.string().default(''),
     recentTitle: z.string().default(''),
-    projectsEyebrow: z.string().default(''),
+    projectsKicker: z.string().default(''),
     projectsTitle: z.string().default(''),
     emptyState: z.string().default(''),
     searchPlaceholder: z.string().default(''),
     searchAria: z.string().default(''),
     searchNoMatch: z.string().default(''),
     searchShortcut: z.string().default('/'),
-    motto: z.string().default(''),
   }),
 });
 

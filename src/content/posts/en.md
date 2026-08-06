@@ -1,8 +1,7 @@
 ---
-pageKey: archive
 lang: en
 title: Archive
-eyebrow: Archive
+kicker: Archive
 emptyState: No English articles yet.
 searchPlaceholder: Search titles, excerpts, or tags…
 searchAria: Search notes

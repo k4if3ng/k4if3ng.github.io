@@ -4,12 +4,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostList from '../PostList.astro';
 import { getPosts } from '../../lib/posts';
 import { getProjects } from '../../lib/projects';
+import { site } from '../../config';
 import { localeMeta, t, type Locale } from '../../i18n/ui';
 import { getPage } from '../../lib/pages';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
 const page = await getPage('home', locale);
-const archivePage = await getPage('archive', locale);
+const archivePage = await getPage('posts', locale);
 const projectsPage = await getPage('projects', locale);
 const posts = await getPosts(locale);
 const projects = await getProjects(locale);
@@ -18,20 +19,20 @@ const prefix = localeMeta[locale].prefix;
 ---
 <BaseLayout locale={locale}>
   <section class="hero">
-    <div class="hero-kicker">
+    <div class="page-kicker">
       <span>{page.data.kicker}</span>
-      <span class="hero-kicker-line" aria-hidden="true"></span>
+      <span class="page-kicker-line" aria-hidden="true"></span>
     </div>
-    <h1>{page.data.title}</h1>
+    <h1>{page.data.heroTitle || site.siteName[locale]}</h1>
     <p class="hero-lead">{page.data.lead}</p>
     <Content />
   </section>
   <section class="section">
-    <div class="section-head"><div><div class="eyebrow">{page.data.recentEyebrow}</div><h2>{page.data.recentTitle}</h2></div><a class="text-link view-all-link link-internal" href={`${prefix}/archive/`} data-link-plain>{t(locale, 'home.viewAll')}</a></div>
+    <div class="section-head"><div><div class="kicker">{page.data.recentKicker}</div><h2>{page.data.recentTitle}</h2></div><a class="text-link view-all-link link-internal" href={`${prefix}/archive/`} data-link-plain>{t(locale, 'home.viewAll')}</a></div>
     {posts.length ? <PostList posts={posts.slice(0, 5)} locale={locale} /> : <p class="empty-state">{archivePage.data.emptyState}</p>}
   </section>
   <section class="section home-projects">
-    <div class="section-head"><div><div class="eyebrow">{page.data.projectsEyebrow}</div><h2>{page.data.projectsTitle}</h2></div><a class="text-link view-all-link link-internal" href={`${prefix}/projects/`} data-link-plain>{t(locale, 'home.viewAll')}</a></div>
+    <div class="section-head"><div><div class="kicker">{page.data.projectsKicker}</div><h2>{page.data.projectsTitle}</h2></div><a class="text-link view-all-link link-internal" href={`${prefix}/projects/`} data-link-plain>{t(locale, 'home.viewAll')}</a></div>
     {projects.length ? projects.slice(0, 2).map((project, index) => <a class="project-row" href={project.data.href} target="_blank" rel="noreferrer" data-link-card><span class="project-index">{String(index + 1).padStart(2, '0')}</span><span><strong>{project.data.name}</strong><small>{project.data.description}</small></span><span class="entry-arrow entry-arrow-external" aria-hidden="true"></span></a>) : <p class="empty-state">{projectsPage.data.emptyState}</p>}
   </section>
 </BaseLayout>

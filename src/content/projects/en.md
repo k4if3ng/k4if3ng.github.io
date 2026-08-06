@@ -1,7 +1,6 @@
 ---
-pageKey: projects
 lang: en
 title: Projects
-eyebrow: Projects
+kicker: Projects
 emptyState: No projects to show yet.
 ---

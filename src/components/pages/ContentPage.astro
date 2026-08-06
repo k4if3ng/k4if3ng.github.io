@@ -4,13 +4,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import type { Locale } from '../../i18n/ui';
 import { getPage } from '../../lib/pages';
 
-interface Props { locale: Locale; pageKey: string; }
-const { locale, pageKey } = Astro.props;
-const page = await getPage(pageKey, locale);
+interface Props { locale: Locale; contentKey: string; }
+const { locale, contentKey } = Astro.props;
+const page = await getPage(contentKey, locale);
 const { Content } = await render(page);
 const hasBody = Boolean(page.body?.trim());
 ---
 <BaseLayout locale={locale} title={page.data.title}>
-  <header class="page-header"><div class="page-kicker"><span>{page.data.eyebrow || pageKey}</span><span class="page-kicker-line" aria-hidden="true"></span></div><h1 class="page-title">{page.data.title}</h1></header>
+  <header class="page-header"><div class="page-kicker"><span>{page.data.kicker || contentKey}</span><span class="page-kicker-line" aria-hidden="true"></span></div><h1 class="page-title">{page.data.title}</h1></header>
   {hasBody ? <article class="prose"><Content /></article> : page.data.emptyState && <p class="empty-state section">{page.data.emptyState}</p>}
 </BaseLayout>
