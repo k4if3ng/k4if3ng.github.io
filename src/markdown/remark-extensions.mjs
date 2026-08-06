@@ -7,6 +7,82 @@ function walk(node) {
     if (!['code', 'inlineCode'].includes(child.type)) enhanceSpoilers(child);
     walk(child);
   }
+  enhanceMedia(node);
+}
+
+function isStandaloneImageParagraph(node) {
+  return node?.type === 'paragraph' && node.children?.length === 1 && node.children[0]?.type === 'image';
+}
+
+function isCaptionParagraph(node) {
+  return node?.type === 'paragraph' && node.children?.length === 1 && node.children[0]?.type === 'emphasis';
+}
+
+function createFigure(image, caption) {
+  const children = [image];
+  if (caption) {
+    children.push({
+      type: 'paragraph',
+      data: { hName: 'figcaption' },
+      children: caption.children,
+    });
+  }
+  return {
+    type: 'paragraph',
+    data: { hName: 'figure' },
+    children,
+  };
+}
+
+function isFigure(node) {
+  return node?.data?.hName === 'figure';
+}
+
+function createGallery(figures) {
+  return {
+    type: 'paragraph',
+    data: { hName: 'div', hProperties: { className: ['gallery'] } },
+    children: figures,
+  };
+}
+
+function enhanceMedia(node) {
+  if (!node?.children?.length) return;
+
+  const enhanced = [];
+  for (let index = 0; index < node.children.length; index += 1) {
+    const child = node.children[index];
+    if (!isStandaloneImageParagraph(child)) {
+      enhanced.push(child);
+      continue;
+    }
+
+    const next = node.children[index + 1];
+    const caption = isCaptionParagraph(next) ? next.children[0] : null;
+    enhanced.push(createFigure(child.children[0], caption));
+    if (caption) index += 1;
+  }
+
+  node.children = enhanced.reduce((children, child) => {
+    if (!isFigure(child)) {
+      children.push(child);
+      return children;
+    }
+    const previous = children[children.length - 1];
+    if (previous?.data?.hName === 'div' && previous.data.hProperties?.className?.includes('gallery')) {
+      previous.children.push(child);
+    } else {
+      children.push(createGallery([child]));
+    }
+    return children;
+  }, []);
+
+  node.children = node.children.map((child) => {
+    if (child?.data?.hName === 'div' && child.data.hProperties?.className?.includes('gallery') && child.children.length === 1) {
+      return child.children[0];
+    }
+    return child;
+  });
 }
 
 function enhanceAlert(node) {

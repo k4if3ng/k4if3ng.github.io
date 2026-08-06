@@ -2,8 +2,11 @@
 pageKey: about
 lang: zh
 title: 关于
-description: 暂时可以透露的情报
+eyebrow: About
+emptyState: 暂时还没有更多可以透露的内容。
 ---
+
+目前可以公开的情报
 
 ## 我是谁？
 

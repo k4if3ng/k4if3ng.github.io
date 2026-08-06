@@ -11,19 +11,21 @@
 | `src/styles/tokens.css` | 浅色／深色颜色、字体语义、核心布局宽度、跨组件间距 |
 | `src/styles/fonts.css` | 自托管字体的 `@font-face` 声明和字符子集 |
 | `src/styles/global.css` | 组件外观、文章排版、响应式规则和动画 |
-| `src/config.ts` | 双语站点信息、社媒和 Gravatar 配置 |
+| `src/config.ts` | 站点身份、地址、社媒和 Gravatar 配置 |
 | `src/config/theme.ts` | 主题选项的值、图标和短文案 key |
 | `src/i18n/config.ts` | 支持语言、默认语言、URL 前缀与 Intl/HTML locale 映射 |
 | `src/i18n/ui.ts` | 类型安全的中英文短 UI 文案与路径本地化 helper |
-| `src/content.config.ts` | note、project 与 page frontmatter 字段和校验规则 |
+| `src/content.config.ts` | note、project 与 page frontmatter 字段、路径范围和校验规则 |
 | `src/lib/posts.ts` | 按语言查询 note、翻译配对、静态路径、canonical URL 与正文摘要 |
 | `src/lib/projects.ts` | 按语言读取并排序 project 内容 |
-| `src/content/projects/` | 中英文 project Markdown 内容 |
-| `src/content/pages/<page-key>/` | 必须双语的 About、Friends 等页面级 Markdown 与 assets |
+| `src/lib/pages.ts` | 按 page key 和语言读取页面文案 |
+| `src/content/home/en.md`、`src/content/home/zh.md` | 首页 title、Markdown hero、motto 和首页分区文案 |
+| `src/content/<page-key>/` | 必须双语的 About、Projects、Friends 等页面级 Markdown 与 assets |
+| `src/content/projects/<project-key>/` | 中英文 project 实体 Markdown 与 assets；`projects/en.md`、`projects/zh.md` 另用于项目页文案 |
 | `scripts/new-content.mjs` | 创建中英文 post／project 草稿的本地脚手架 |
 | `src/components/pages/` | Home、Archive、Projects、About、404、Post 的共享页面结构 |
 | `src/components/PostList.astro` | 首页文章列表，以及日期与 tags 的同行展示 |
-| `src/markdown/remark-extensions.mjs` | `[!NOTE]` alert 和 `==spoiler==` 扩展 |
+| `src/markdown/remark-extensions.mjs` | `[!NOTE]` alert、`==spoiler==`、图片 caption 和 gallery 扩展 |
 | `src/markdown/shiki-toolbar.mjs` | 构建期代码块工具栏、语言标识和复制按钮结构 |
 | `src/markdown/lang-icons.mjs` | 代码语言到 Iconify 图标的映射与 SVG 输出 |
 | `src/config/code-block.json` | 可维护的代码语言别名、显示名称和图标配置 |
@@ -93,7 +95,7 @@
 
 ## 3. 站点、社媒与项目
 
-`src/config.ts` 是站点身份、地址和社媒的单一入口。`site.locales.zh/en` 分别维护站点标题、SEO description、首页简介 `homeIntro` 和侧栏 motto；布局与首页会按当前 locale 自动选择，不要在页面或 `ui.ts` 重复填写这些站点定位文案。
+`src/config.ts` 只维护稳定的站点身份、地址和社媒配置。首页及页面级可编辑文案进入 Content Collection：`src/content/home/{zh,en}.md` 维护首页 title、kicker、lead、Markdown 正文、motto 和分区标题；`src/content/<page-key>/{zh,en}.md` 维护其他页面的标题，Archive 页面文案位于 `src/content/posts/{zh,en}.md`。所有页面都不再维护独立的 description 字段；布局通过 `getPage()` 读取标题和正文，不再从 `config.ts` 或 `ui.ts` 复制这些文案。
 
 ### 社媒
 
@@ -132,12 +134,12 @@ Markdown 正文可以记录更完整的背景和设计说明，目前列表页�
 
 本站只支持中文和英文。`src/i18n/config.ts` 是语言配置的单一入口：中文当前是默认无前缀路由，英文使用 `/en/`；`astro.config.mjs` 直接读取这里的 `locales` 与 `defaultLocale`。未来调整默认语言时，应同时重新评估 `localeMeta.prefix`、现有 URL 重定向、canonical 和 sitemap，不要只改页面文案。
 
-`src/i18n/ui.ts` 使用中文 key 集合作为类型基准，英文必须提供完全相同的 key。导航、按钮、tooltip、ARIA、空状态、搜索、文章工具栏和复制状态等短文案都通过 `t(locale, key, values)` 在构建期输出，不使用浏览器运行时翻译。
+`src/i18n/ui.ts` 使用中文 key 集合作为类型基准，英文必须提供完全相同的 key。导航、按钮、tooltip、ARIA、搜索、文章工具栏和复制状态等短 UI 文案都通过 `t(locale, key, values)` 在构建期输出，不使用浏览器运行时翻译；页面级空状态放在对应 Markdown 的 `emptyState` 字段中。
 
 非 Post 页面必须双语：
 
 - Home、Archive、Projects 和 404 共用 `src/components/pages/` 中的 Astro 结构，根路由与 `/en/` 路由只传入 locale。
-- About 的中英文正文分别位于 `src/content/pages/about/zh.md` 与 `src/content/pages/about/en.md`，使用通用 `ContentPage.astro`；页面视觉素材直接由 Markdown 引用。
+- Home 的页面文案位于 `src/content/home/zh.md` 与 `src/content/home/en.md`；About、Projects 等页面文案位于 `src/content/<page-key>/{zh,en}.md`；Archive 页面文案位于 `src/content/posts/{zh,en}.md`，与文章实体共用目录但由 collection loader 分流。页面视觉素材直接由 Markdown 引用。
 - Project 必须提供 `zh`、`en` 完整配对；`getProjects()` 会在构建期间检查同一 `translationKey` 是否两种语言都存在。
 
 Post 可以只有中文或只有英文：中文 URL 是 `/posts/YYYY/MM/slug/`，英文 URL 是 `/en/posts/YYYY/MM/slug/`。只有两篇文章设置相同的 `translationKey` 时才显示语言切换并生成双向 `hreflang`；单语文章的语言按钮保持禁用，不创建不存在的翻译 URL。
@@ -146,12 +148,54 @@ Post 可以只有中文或只有英文：中文 URL 是 `/posts/YYYY/MM/slug/`�
 
 不要为了追求“全部抽象”把长正文拆成大量 message key：短 UI 进入 `ui.ts`，可增长的结构化内容进入 Content Collection，复杂动态布局留在共享 Astro 组件中。
 
-## 5. 添加一个新的双语页面
+### 页面文案的组织方式
 
-页面级内容也按 page key 收进独立目录；About 已采用这一结构。以“友链”为例，推荐沿用当前页面组件和内容集合的分工：
+页面级文案和交互性 UI 文案分开维护。当前目录约定为：
 
 ```text
-src/content/pages/friends/
+src/content/
+├── home/
+│   ├── en.md             # Home 页面 metadata 与 Markdown hero
+│   └── zh.md
+├── about/
+│   ├── en.md
+│   └── zh.md
+├── projects/
+│   ├── en.md             # Projects 页面标题与描述
+│   ├── zh.md
+│   └── <project-key>/    # 项目实体与 assets
+└── posts/
+    ├── en.md             # Archive 页面文案
+    ├── zh.md
+    └── <post-key>/       # 文章实体与 assets
+```
+
+这些页面文件使用 `pageKey`、`lang`、`title`、`emptyState` 等 frontmatter 字段；首页额外使用 `kicker` 和 `lead` metadata，页面组件负责输出首页头部，description 类介绍文字直接写在 Markdown 正文中，仍可继续加入链接、强调、段落和图片；`motto`、动态列表标题和 Archive 搜索提示等仍保留在 frontmatter，供布局和动态组件读取。`src/lib/pages.ts` 的 `getPage(pageKey, locale)` 负责按页面和语言读取唯一内容。
+
+`src/i18n/ui.ts` 只保留导航、按钮、tooltip、ARIA、搜索和动态数量等交互性短文案。比如“记录代码、设计，以及仍在生长的想法。”、“项目”、“一些正在生长的作品与实验。”以及各页面空状态，都应分别编辑对应 Markdown，不需要修改 TypeScript。
+
+Markdown 图片默认使用 `![替代文本](./assets/image.png)`。若需要可见 caption，在图片后紧跟一个只包含斜体文字的段落：
+
+```md
+![系统架构图](./assets/diagram.png)
+
+*图 1：系统架构与数据流。*
+```
+
+构建时会生成语义化的 `<figure>` 和 `<figcaption>`。连续的独立图片会自动合并为 `.gallery`，桌面端两列、窄屏单列；每张图片之间保留空行，以便 Markdown parser 将它们识别为独立段落：
+
+```md
+![界面一](./assets/one.png)
+
+![界面二](./assets/two.png)
+```
+
+## 5. 添加一个新的双语页面
+
+页面级内容按 page key 收进 `src/content/<page-key>/` 独立目录。以“友链”为例，推荐沿用当前页面组件和内容集合的分工：
+
+```text
+src/content/friends/
 ├── assets/
 ├── zh.md
 └── en.md
@@ -163,12 +207,12 @@ src/pages/en/friends.astro
 
 实施步骤：
 
-1. 优先运行 `pnpm new:page -- friends`；它会创建内容目录和中英文路由入口。
+1. 优先运行 `pnpm new:page -- friends`；它会创建 `src/content/friends/` 内容目录和中英文路由入口。
 2. 通用文字页面使用 `ContentPage.astro`，不再为每一页复制查询与排版逻辑；只有特殊视觉结构才新建专用页面组件。
 3. 如果页面要进入主导航，修改 `src/layouts/BaseLayout.astro` 的 `nav` 数组，并在 `src/i18n/ui.ts` 添加导航文案。
 4. 如果它只是旧链接兼容入口，可以保留独立 redirect；真正启用页面时再改为 `ContentPage` 路由。
 
-文章、项目和普通页面的职责保持分开：可增长的正文放 `src/content/`，页面骨架放 `src/components/pages/`，URL 入口放 `src/pages/`。
+文章、项目和普通页面的职责保持分开：可增长的正文与页面文案放 `src/content/`，页面骨架放 `src/components/pages/`，URL 入口放 `src/pages/`。`ui.ts` 只保留导航、按钮、tooltip、ARIA、搜索和空状态等交互性短文案。
 
 ### `src/pages/` 与 URL 的对应关系
 
@@ -203,7 +247,7 @@ src/content/posts/my-first-note/
 └── en.md
 ```
 
-项目生成到相同结构的 `projects/<slug>/`。脚手架始终生成 `draft: true`，因此占位标题、示例 URL 和未完成正文不会进入线上站点。文章模板将 `tags`、`updatedAt`、`legacyPath` 等可选字段作为 YAML 注释；项目模板同样将 `stack`、`image` 作为注释。填写完必填字段并将两份内容的 `draft` 设为 `false` 后，运行 `pnpm run build`。
+项目生成到相同结构的 `projects/<slug>/`。脚手架始终生成 `draft: true`，因此占位标题、示例 URL 和未完成正文不会进入线上站点。文章模板将 `tags`、`updatedAt` 等可选字段作为 YAML 注释；项目模板同样将 `stack`、`image` 作为注释。填写完必填字段并将两份内容的 `draft` 设为 `false` 后，运行 `pnpm run build`。
 
 文章图片和项目封面一律放在各自内容目录的 `assets/`：例如 `src/content/posts/<slug>/assets/diagram.png` 或 `src/content/projects/<slug>/assets/cover.webp`。文章 Markdown 使用 `![说明](./assets/diagram.png)`；项目 frontmatter 使用 `image: ./assets/cover.webp`。Astro 会在构建时将这些本地资源输出到站点资源目录，页面组件不再依赖 `public/images` 中的内容图片。
 
@@ -256,7 +300,6 @@ tags: [astro, design]
 lang: zh
 translationKey: optional-shared-id
 draft: false
-legacyPath: /old/path/
 ---
 ```
 
@@ -282,7 +325,7 @@ lang: zh
 
 生成地址是 `/posts/2025/04/content-workflow/`；英文文件的 `title` 可为 `Content workflow`，`lang: en` 会生成 `/en/posts/2025/04/content-workflow/`。两者通过相同的 `translationKey` 建立语言切换和 `hreflang` 关系，而不是通过 title、文件夹名或 URL 猜测彼此。
 
-`slug` 是必填字段，只允许小写英文、数字和单连字符；修改它就会修改公开 URL。Collection 内部 ID 则由源文件路径生成，所以 `zh.md` 和 `en.md` 能自然共用同一个 slug，不会互相覆盖。当前代码仍会去除旧 slug 末尾的 `-zh` 或 `-en` 以兼容历史内容，但新文章不应使用该后缀。同一语言、同一月份的重复 URL 会让构建失败。`legacyPath` 用于旧地址 301 迁移。
+`slug` 是必填字段，只允许小写英文、数字和单连字符；修改它就会修改公开 URL。Collection 内部 ID 则由源文件路径生成，所以 `zh.md` 和 `en.md` 能自然共用同一个 slug，不会互相覆盖。同一语言、同一月份的重复 URL 会让构建失败。
 
 `translationKey` 对 Post 是可选字段。同一文章的中英文译本填写相同值；单语文章省略即可。每种语言下同一个 translationKey 最多只能出现一次。
 
@@ -367,4 +410,4 @@ pnpm run deploy
 5. archive 搜索、项目图片、空社媒占位。
 6. 普通引用、五种 Alert、spoiler、站内／站外链接。
 
-修改 locale、URL、slug、`translationKey` 或 `legacyPath` 时，还要检查中英文生成目录、两份 RSS、canonical、hreflang、sitemap 和旧地址重定向。
+修改 locale、URL、slug 或 `translationKey` 时，还要检查中英文生成目录、两份 RSS、canonical、hreflang 和 sitemap。

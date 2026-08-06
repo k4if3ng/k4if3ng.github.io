@@ -25,7 +25,7 @@ const copyFailed = t(locale, 'post.copyFailed');
 ---
 <BaseLayout locale={locale} title={post.data.title} description={excerpt} hasTranslation={Boolean(alternate)} alternateHref={alternate ? getPostPath(alternate) : null}>
   <header class="page-header article-header" id="article-top">
-    <div class="eyebrow">{t(locale, 'post.eyebrow', { tag: post.data.tags[0] ?? 'note' })}</div>
+    <div class="page-kicker"><span>{t(locale, 'post.eyebrow', { tag: post.data.tags[0] ?? 'note' })}</span><span class="page-kicker-line" aria-hidden="true"></span></div>
     <h1 class="page-title">{post.data.title}</h1>
     <div class="article-meta"><time class="article-meta-date" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale, { dateStyle: 'long' })}</time><span class="article-meta-stat">{t(locale, 'post.words', { count: wordCount })}</span><span class="article-meta-stat">{t(locale, 'post.reading', { count: readingMinutes })}</span>{post.data.tags.map(tag => <span class="article-tag">#{tag}</span>)}</div>
   </header>

@@ -16,6 +16,7 @@ export default defineConfig({
     routing: { prefixDefaultLocale: false },
   },
   markdown: {
+    smartypants: false,
     remarkPlugins: [remarkExtensions],
     shikiConfig: {
       // Keep syntax highlighting and the code toolbar in the same build pass,

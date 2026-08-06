@@ -3,8 +3,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPostExcerpt, getPostPath, getPosts } from '../../lib/posts';
 import { t, type Locale } from '../../i18n/ui';
 import { formatDate } from '../../i18n/formatters';
+import { getPage } from '../../lib/pages';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
+const page = await getPage('archive', locale);
 const posts = await getPosts(locale);
 const grouped = posts.reduce<Record<string, typeof posts>>((result, post) => {
   const year = String(post.data.publishedAt.getFullYear());
@@ -13,10 +15,10 @@ const grouped = posts.reduce<Record<string, typeof posts>>((result, post) => {
 }, {});
 const years = Object.entries(grouped).sort(([a], [b]) => Number(b) - Number(a));
 ---
-<BaseLayout locale={locale} title={t(locale, 'archive.title')}>
-  <header class="page-header compact-header"><div><div class="eyebrow">{t(locale, 'archive.eyebrow')}</div><h1 class="page-title">{t(locale, 'archive.title')}</h1></div><p>{t(locale, 'archive.count', { count: posts.length })}</p></header>
-  <div class="note-search"><span aria-hidden="true">⌕</span><input type="search" placeholder={t(locale, 'archive.searchPlaceholder')} aria-label={t(locale, 'archive.searchAria')} data-note-search disabled={!posts.length} /><kbd>/</kbd></div>
-  <p class="search-empty" data-search-empty hidden>{t(locale, 'archive.noMatch')}</p>
+<BaseLayout locale={locale} title={page.data.title}>
+  <header class="page-header compact-header"><div><div class="page-kicker"><span>{page.data.eyebrow}</span><span class="page-kicker-line" aria-hidden="true"></span></div><h1 class="page-title">{page.data.title}</h1></div><p>{t(locale, 'archive.count', { count: posts.length })}</p></header>
+  <div class="note-search"><span aria-hidden="true">⌕</span><input type="search" placeholder={page.data.searchPlaceholder} aria-label={page.data.searchAria} data-note-search disabled={!posts.length} /><kbd>{page.data.searchShortcut}</kbd></div>
+  <p class="search-empty" data-search-empty hidden>{page.data.searchNoMatch}</p>
   {posts.length ? <div class="archive-list">
     {years.map(([year, yearPosts]) => <section class="archive-year"><h2>{year}</h2><div>
       {yearPosts.map(post => <a class="archive-entry" href={getPostPath(post)} data-link-card data-search-entry data-search-text={`${post.data.title} ${getPostExcerpt(post)} ${post.data.tags.join(' ')}`.toLocaleLowerCase()}>
@@ -24,7 +26,7 @@ const years = Object.entries(grouped).sort(([a], [b]) => Number(b) - Number(a));
         <strong>{post.data.title}</strong><div class="tags">{post.data.tags.map(tag => <span class="tag">#{tag}</span>)}</div><span class="entry-arrow entry-arrow-internal" aria-hidden="true"></span>
       </a>)}
     </div></section>)}
-  </div> : <p class="empty-state section">{t(locale, 'archive.empty')}</p>}
+  </div> : <p class="empty-state section">{page.data.emptyState}</p>}
   <script is:inline>
     const searchInput = document.querySelector('[data-note-search]');
     const entries = [...document.querySelectorAll('[data-search-entry]')];

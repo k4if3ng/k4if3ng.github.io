@@ -2,8 +2,11 @@
 pageKey: about
 lang: en
 title: About
-description: Information that can be revealed for now
+eyebrow: About
+emptyState: There is nothing more to share for now.
 ---
+
+Current Publicly Available Information
 
 ## Who am I?
 

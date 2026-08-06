@@ -4,12 +4,13 @@ import { ClientRouter } from 'astro:transitions';
 import { avatarUrl, site, socials } from '../config';
 import PreferenceControls from '../components/PreferenceControls.astro';
 import { localeMeta, localizePath, t, type Locale } from '../i18n/ui';
+import { getPage } from '../lib/pages';
 
 interface Props { title?: string; description?: string; locale?: Locale; hasTranslation?: boolean; alternateHref?: string | null; }
 const locale = Astro.props.locale ?? (Astro.url.pathname === '/en' || Astro.url.pathname.startsWith('/en/') ? 'en' : 'zh');
-const localizedSite = site.locales[locale];
-const { title, description = localizedSite.description, hasTranslation = true, alternateHref } = Astro.props;
-const localizedSiteTitle = localizedSite.title;
+const homePage = await getPage('home', locale);
+const { title, description, hasTranslation = true, alternateHref } = Astro.props;
+const localizedSiteTitle = homePage.data.title;
 const pageTitle = title ? `${title} | ${localizedSiteTitle}` : localizedSiteTitle;
 const path = Astro.url.pathname;
 const prefix = localeMeta[locale].prefix;
@@ -34,12 +35,12 @@ const siteYearLabel = currentYear > siteStartYear ? `${siteStartYear}-${currentY
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
+    {description && <meta name="description" content={description} />}
     <meta name="theme-color" content="#003153" />
     <link rel="icon" href="/images/favicon.svg" />
     <link rel="canonical" href={canonicalUrl} />
     {alternateUrl && <><link rel="alternate" hreflang={localeMeta[locale].htmlLang} href={canonicalUrl} /><link rel="alternate" hreflang={localeMeta[alternateLocale].htmlLang} href={alternateUrl} /><link rel="alternate" hreflang="x-default" href={locale === 'zh' ? canonicalUrl : alternateUrl} /></>}
-    <link rel="alternate" type="application/rss+xml" title={localizedSite.title} href={`${prefix}/rss.xml`} />
+    <link rel="alternate" type="application/rss+xml" title={localizedSiteTitle} href={`${prefix}/rss.xml`} />
     <title>{pageTitle}</title>
     <ClientRouter />
     <script is:inline>
@@ -70,7 +71,7 @@ const siteYearLabel = currentYear > siteStartYear ? `${siteStartYear}-${currentY
           <small>Kaifeng</small>
         </span>
       </a>
-      <p class="mobile-motto">{localizedSite.motto}</p>
+      <p class="mobile-motto">{homePage.data.motto}</p>
     </section>
     <div class="shell app">
       <aside class="sidebar" transition:name="site-sidebar">
@@ -78,7 +79,7 @@ const siteYearLabel = currentYear > siteStartYear ? `${siteStartYear}-${currentY
           <img class="avatar" src={avatarUrl} width="84" height="84" alt={t(locale, 'a11y.avatar', { name: site.name })} />
           <span class="identity-name"><strong>凯风</strong><small>Kaifeng</small></span>
         </a>
-        <div class="site-kind">{localizedSite.motto}</div>
+        <div class="site-kind">{homePage.data.motto}</div>
         <nav class="nav" aria-label={t(locale, 'a11y.mainNav')}>
           {nav.map(item => <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>)}
         </nav>

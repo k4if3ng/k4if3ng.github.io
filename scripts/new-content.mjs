@@ -24,7 +24,9 @@ if (!validTypes.has(type) || !slugPattern.test(slug ?? '')) {
 
 const root = process.cwd();
 const collectionDir = type === 'post' ? 'posts' : type === 'project' ? 'projects' : 'pages';
-const contentDir = resolve(root, 'src', 'content', collectionDir, slug);
+const contentDir = type === 'page'
+  ? resolve(root, 'src', 'content', slug)
+  : resolve(root, 'src', 'content', collectionDir, slug);
 const assetDir = resolve(contentDir, 'assets');
 const files = [resolve(contentDir, 'zh.md'), resolve(contentDir, 'en.md')];
 const routeFiles = type === 'page'
@@ -40,15 +42,15 @@ const date = new Intl.DateTimeFormat('en-CA', {
 
 const templates = type === 'post'
   ? {
-      zh: `---\ntitle: "TODO：中文标题"\nslug: ${slug}\npublishedAt: ${date}\nlang: zh\ntranslationKey: ${slug}\ndraft: true\n# tags: [astro, note]\n# updatedAt: ${date}\n# legacyPath: /old/path/\n---\n\n在这里开始写中文正文。发布前将 \`draft\` 改为 \`false\`。\n`,
-      en: `---\ntitle: "TODO: English title"\nslug: ${slug}\npublishedAt: ${date}\nlang: en\ntranslationKey: ${slug}\ndraft: true\n# tags: [astro, note]\n# updatedAt: ${date}\n# legacyPath: /old/path/\n---\n\nStart writing the English article here. Change \`draft\` to \`false\` before publishing.\n`,
+      zh: `---\ntitle: "TODO：中文标题"\nslug: ${slug}\npublishedAt: ${date}\nlang: zh\ntranslationKey: ${slug}\ndraft: true\n# tags: [astro, note]\n# updatedAt: ${date}\n---\n\n在这里开始写中文正文。发布前将 \`draft\` 改为 \`false\`。\n`,
+      en: `---\ntitle: "TODO: English title"\nslug: ${slug}\npublishedAt: ${date}\nlang: en\ntranslationKey: ${slug}\ndraft: true\n# tags: [astro, note]\n# updatedAt: ${date}\n---\n\nStart writing the English article here. Change \`draft\` to \`false\` before publishing.\n`,
     }
   : type === 'project' ? {
       zh: `---\nname: "TODO：项目名称"\nlang: zh\ntranslationKey: ${slug}\ndescription: "TODO：一句话介绍项目。"\nhref: https://example.com/${slug}\nstatus: 草稿\norder: 999\ndraft: true\n# stack: [Astro, TypeScript]\n# image: ./assets/cover.webp\n---\n\n在这里记录项目的中文背景、目标和进展。发布前填写真实链接，并将 \`draft\` 改为 \`false\`。\n`,
       en: `---\nname: "TODO: Project name"\nlang: en\ntranslationKey: ${slug}\ndescription: "TODO: Describe the project in one sentence."\nhref: https://example.com/${slug}\nstatus: Draft\norder: 999\ndraft: true\n# stack: [Astro, TypeScript]\n# image: ./assets/cover.webp\n---\n\nDocument the English background, goals, and progress here. Add the real link and change \`draft\` to \`false\` before publishing.\n`,
     } : {
-      zh: `---\npageKey: ${slug}\nlang: zh\ntitle: "TODO：页面标题"\ndescription: "TODO：一句话说明这个页面。"\n---\n\n在这里开始写页面正文。\n`,
-      en: `---\npageKey: ${slug}\nlang: en\ntitle: "TODO: Page title"\ndescription: "TODO: Describe this page in one sentence."\n---\n\nStart writing the page here.\n`,
+      zh: `---\npageKey: ${slug}\nlang: zh\ntitle: "TODO：页面标题"\n---\n\n在这里开始写页面正文。\n`,
+      en: `---\npageKey: ${slug}\nlang: en\ntitle: "TODO: Page title"\n---\n\nStart writing the page here.\n`,
     };
 
 const plannedFiles = [...files, ...routeFiles];

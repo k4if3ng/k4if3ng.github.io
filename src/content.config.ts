@@ -6,7 +6,11 @@ import { glob } from 'astro/loaders';
 const markdownEntryId = ({ entry }: { entry: string }) => entry.replace(/\.(?:md|mdx)$/, '');
 
 const posts = defineCollection({
-  loader: glob({ base: './src/content/posts', pattern: '**/*.{md,mdx}', generateId: markdownEntryId }),
+  loader: glob({
+    base: './src/content/posts',
+    pattern: ['**/*.{md,mdx}', '!{en,zh}.{md,mdx}'],
+    generateId: markdownEntryId,
+  }),
   schema: z.object({
     title: z.string(),
     slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
@@ -16,12 +20,12 @@ const posts = defineCollection({
     lang: z.enum(['zh', 'en']).default('zh'),
     translationKey: z.string().optional(),
     draft: z.boolean().default(false),
-    legacyPath: z.string().optional(),
   }),
 });
 
 const projects = defineCollection({
-  loader: glob({ base: './src/content/projects', pattern: '**/*.{md,mdx}', generateId: markdownEntryId }),
+  // The direct en.md/zh.md files are page copy for /projects/; project entities live in child directories.
+  loader: glob({ base: './src/content/projects', pattern: ['**/*.{md,mdx}', '!{en,zh}.md'], generateId: markdownEntryId }),
   schema: ({ image }) => z.object({
     name: z.string(),
     lang: z.enum(['zh', 'en']),
@@ -37,12 +41,30 @@ const projects = defineCollection({
 });
 
 const pages = defineCollection({
-  loader: glob({ base: './src/content/pages', pattern: '**/*.{md,mdx}', generateId: markdownEntryId }),
+  // Page copy lives at src/content/home/{en,zh}.md or src/content/<page-key>/{en,zh}.md.
+  // Posts and project entities use their own schemas and are excluded here.
+  loader: glob({
+    base: './src/content',
+    pattern: ['**/*.{md,mdx}', '!posts/*/*.{md,mdx}', '!projects/*/*.{md,mdx}'],
+    generateId: markdownEntryId,
+  }),
   schema: z.object({
     pageKey: z.string(),
     lang: z.enum(['zh', 'en']),
     title: z.string(),
-    description: z.string(),
+    kicker: z.string().default(''),
+    lead: z.string().default(''),
+    eyebrow: z.string().default(''),
+    recentEyebrow: z.string().default(''),
+    recentTitle: z.string().default(''),
+    projectsEyebrow: z.string().default(''),
+    projectsTitle: z.string().default(''),
+    emptyState: z.string().default(''),
+    searchPlaceholder: z.string().default(''),
+    searchAria: z.string().default(''),
+    searchNoMatch: z.string().default(''),
+    searchShortcut: z.string().default('/'),
+    motto: z.string().default(''),
   }),
 });
 

@@ -2,17 +2,11 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import type { Locale } from '../i18n/ui';
 
-export function getPostSlug(post: CollectionEntry<'posts'>) {
-  // Preserve existing URLs created with legacy -zh/-en suffixes.
-  const slug = post.data.slug;
-  return slug.replace(/-(?:zh|en)$/, '');
-}
-
 export function getPostPath(post: CollectionEntry<'posts'>) {
   const year = post.data.publishedAt.getFullYear();
   const month = String(post.data.publishedAt.getMonth() + 1).padStart(2, '0');
   const prefix = post.data.lang === 'en' ? '/en' : '';
-  return `${prefix}/posts/${year}/${month}/${getPostSlug(post)}/`;
+  return `${prefix}/posts/${year}/${month}/${post.data.slug}/`;
 }
 
 export async function getPosts(locale: Locale) {
@@ -38,15 +32,9 @@ export async function getPostStaticPaths(locale: Locale) {
   const routePrefix = locale === 'en' ? '/en/posts/' : '/posts/';
   const canonical = posts.map((post, index) => ({
     params: { id: getPostPath(post).replace(routePrefix, '').replace(/\/$/, '') },
-    props: { post, redirectTo: null, older: posts[index + 1], newer: posts[index - 1] },
+    props: { post, older: posts[index + 1], newer: posts[index - 1] },
   }));
-  const aliases = posts.flatMap(post => {
-    const legacySlug = post.data.legacyPath?.split('/').filter(Boolean).pop();
-    return legacySlug && getPostPath(post) !== `${routePrefix}${legacySlug}/`
-      ? [{ params: { id: legacySlug }, props: { post, redirectTo: getPostPath(post), older: undefined, newer: undefined } }]
-      : [];
-  });
-  return [...canonical, ...aliases];
+  return canonical;
 }
 
 /** Build one consistent list/SEO/RSS excerpt from the first prose paragraph. */

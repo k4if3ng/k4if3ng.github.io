@@ -1,19 +1,5 @@
 export const site = {
   name: 'Kaifeng',
-  locales: {
-    zh: {
-      title: '凯风的博客',
-      description: '记录代码、设计，以及仍在生长的想法。',
-      homeIntro: '技术笔记、项目片段，和偶尔偏离主线的生活记录。',
-      motto: '回到过去是无用的，\n因为我现在已经不一样了。',
-    },
-    en: {
-      title: "Kaifeng's Blog",
-      description: 'Notes on code, design, and ideas in progress.',
-      homeIntro: 'Technical notes, project fragments, and occasional life detours.',
-      motto: 'It\'s no use going back to yesterday,\nbecause I am different now.',
-    },
-  },
   url: 'https://www.kfenghub.top',
   github: 'https://github.com/k4if3ng',
   bilibili: 'https://space.bilibili.com/259333405',

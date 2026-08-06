@@ -1,16 +1,16 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import type { Locale } from '../../i18n/ui';
+import { getPage } from '../../lib/pages';
 
 interface Props { locale: Locale; pageKey: string; }
 const { locale, pageKey } = Astro.props;
-const entries = await getCollection('pages', ({ data }) => data.pageKey === pageKey && data.lang === locale);
-if (entries.length !== 1) throw new Error(`Expected exactly one ${locale} ${pageKey} page, found ${entries.length}.`);
-const page = entries[0];
+const page = await getPage(pageKey, locale);
 const { Content } = await render(page);
+const hasBody = Boolean(page.body?.trim());
 ---
-<BaseLayout locale={locale} title={page.data.title} description={page.data.description}>
-  <header class="page-header"><div class="eyebrow">{pageKey}</div><h1 class="page-title">{page.data.title}</h1><p>{page.data.description}</p></header>
-  <article class="prose"><Content /></article>
+<BaseLayout locale={locale} title={page.data.title}>
+  <header class="page-header"><div class="page-kicker"><span>{page.data.eyebrow || pageKey}</span><span class="page-kicker-line" aria-hidden="true"></span></div><h1 class="page-title">{page.data.title}</h1></header>
+  {hasBody ? <article class="prose"><Content /></article> : page.data.emptyState && <p class="empty-state section">{page.data.emptyState}</p>}
 </BaseLayout>
