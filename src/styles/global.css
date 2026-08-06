@@ -55,6 +55,7 @@ html[lang='en'] .site-kind { font-family: var(--font-heading); letter-spacing: .
 .socials > :is(a, .social-placeholder):hover::after, .socials > :is(a, .social-placeholder):focus-visible::after { opacity: 1; visibility: visible; translate: 0; }
 .social-icon { width: 14px; height: 14px; background: currentColor; mask: var(--icon) center / contain no-repeat; -webkit-mask: var(--icon) center / contain no-repeat; }
 .socials a[aria-label='Email'] .social-icon { width: 16px; height: 16px; }
+.socials a[aria-label='Curriculum Vitae (EN)'] .social-icon, .socials a[aria-label='中文简历'] .social-icon { width: 22px; height: 22px; }
 .icon-button { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--muted); cursor: pointer; }
 .icon-button:hover { color: var(--accent-strong); border-color: var(--accent); }
 .quick-controls { display: flex; justify-content: flex-end; gap: 5px; width: 100%; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -322,6 +323,7 @@ body[data-code-line-numbers='off'] .prose pre:is(.astro-code, .shiki) .line { pa
   .mobile-socials > :is(a, .social-placeholder) { width: 26px; height: 26px; }
   .mobile-socials .social-icon { width: 14px; height: 14px; }
   .mobile-socials a[aria-label='Email'] .social-icon { width: 16px; height: 16px; }
+  .mobile-socials a[aria-label='Curriculum Vitae (EN)'] .social-icon, .mobile-socials a[aria-label='中文简历'] .social-icon { width: 20px; height: 20px; }
   .hero { padding-top: 6px; }
   .hero h1 { font-size: clamp(27px, 8vw, 34px); }
   .post-card { gap: 5px 12px; }

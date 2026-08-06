@@ -21,9 +21,9 @@ export const site = {
   linuxdo: 'https://linux.do/u/k4if3ng/summary',
   x: 'https://x.com/k4if3ng',
   zhihu: '',
-  resume: '/documents/resume/en.pdf',
+  resume_en: '/documents/resume/resume-en.pdf',
+  resume_zh: '/documents/resume/resume-zh_CN.pdf',
   avatar: '/images/avatar.jpg',
-  // 在 Gravatar 设置头像后，将邮箱的 MD5（小写、去空格）填入这里即可启用。
   gravatarHash: '6aa1967a641094ee937ff87c3998dfca',
 } as const;
 
@@ -35,7 +35,8 @@ export const socials = [
   { label: 'X', href: site.x, icon: '/icons/x.svg', target: '_blank' },
   { label: 'Email', href: site.email, icon: '/icons/mail.svg', target: undefined },
   { label: 'RSS', href: '/rss.xml', icon: '/icons/rss.svg', target: undefined },
-  { label: 'Résumé', href: site.resume, icon: '/icons/file-text.svg', target: '_blank' },
+  { label: 'Curriculum Vitae (EN)', href: site.resume_en, icon: '/icons/cv-en.svg', target: '_blank' },
+  { label: '中文简历', href: site.resume_zh, icon: '/icons/cv-zh.svg', target: '_blank' },
 ] as const;
 
 export const avatarUrl = site.gravatarHash
