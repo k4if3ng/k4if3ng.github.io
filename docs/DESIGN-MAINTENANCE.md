@@ -175,21 +175,21 @@ src/content/
 
 `src/i18n/ui.ts` 只保留导航、按钮、tooltip、ARIA、搜索和动态数量等交互性短文案。比如“记录代码、设计，以及仍在生长的想法。”、“项目”、“一些正在生长的作品与实验。”以及各页面空状态，都应分别编辑对应 Markdown，不需要修改 TypeScript。
 
-Markdown 图片默认使用 `![替代文本](./assets/image.png)`。若需要可见 caption，在图片后紧跟一个只包含斜体文字的段落：
+Markdown 图片默认使用 `![替代文本](./assets/image.png)`。如果需要在同一行同时写图片标题和显示宽度，可以使用项目扩展语法：
 
 ```md
-![系统架构图](./assets/diagram.png)
-
-*图 1：系统架构与数据流。*
+![系统架构图](./assets/diagram.png "图 1：系统架构与数据流。"){width=72%}
 ```
 
-构建时会生成语义化的 `<figure>` 和 `<figcaption>`。连续的独立图片会自动合并为 `.gallery`，桌面端两列、窄屏单列；每张图片之间保留空行，以便 Markdown parser 将它们识别为独立段落：
+`title` 会生成可见的 `figcaption`；`width` 支持 `%`、`px`、`rem`、`em`、`vw` 和 `vh`，用于控制单张图片的宽度。普通图片不会自动排列，连续图片也会像一般 Markdown 一样逐张纵向显示。如果确实需要横向排列，必须给参与排列的每张图片显式添加 `layout=grid`；连续的 grid 图片会合并为一个 gallery，桌面端横向排列、窄屏自动改为纵向：
 
 ```md
-![界面一](./assets/one.png)
+![界面一](./assets/one.png "界面一"){width=42% layout=grid}
 
-![界面二](./assets/two.png)
+![界面二](./assets/two.png "界面二"){width=42% layout=grid}
 ```
+
+不需要横向排列时，不写 `layout` 即可。
 
 ## 5. 添加一个新的双语页面
 
@@ -248,7 +248,7 @@ src/content/posts/YYYY/MM/my-first-note/
 └── en.md
 ```
 
-Project 生成到 `src/content/projects/<project-key>/{zh,en}.md`，其中 project key 必须唯一。脚手架默认生成两种语言的 `draft: true` 文件，项目只需要一种语言时可以删除另一份文件；占位标题、示例 URL 和未完成正文不会进入线上站点。项目介绍写在 Markdown 正文中，可以包含多句话和多个段落；`status` 可以省略或留空。文章模板将 `tags`、`updatedAt` 等可选字段作为 YAML 注释；项目模板同样将 `stack`、`image` 作为注释。填写完需要发布的语言文件并将其 `draft` 设为 `false` 后，运行 `pnpm run build`。
+Project 生成到 `src/content/projects/<project-key>/{zh,en}.md`，其中 project key 必须唯一。脚手架默认生成两种语言的 `draft: true` 文件，项目只需要一种语言时可以删除另一份文件；占位标题、示例 URL 和未完成正文不会进入线上站点。项目介绍写在 Markdown 正文中，可以包含多句话和多个段落；`status` 可以省略或留空。文章模板将 `tags` 等可选字段作为 YAML 注释；项目模板同样将 `stack`、`image` 作为注释。填写完需要发布的语言文件并将其 `draft` 设为 `false` 后，运行 `pnpm run build`。
 
 文章图片和项目封面一律放在各自内容目录的 `assets/`：例如 `src/content/posts/YYYY/MM/<slug>/assets/diagram.png` 或 `src/content/projects/<project-key>/assets/cover.webp`。文章 Markdown 使用 `![说明](./assets/diagram.png)`；项目 frontmatter 使用 `image: ./assets/cover.webp`。Astro 会在构建时将这些本地资源输出到站点资源目录，页面组件不再依赖 `public/images` 中的内容图片。
 
@@ -295,7 +295,6 @@ pnpm run preview
 ---
 title: 中文标题
 publishedAt: 2026-08-04
-updatedAt: 2026-08-05
 tags: [astro, design]
 draft: false
 ---

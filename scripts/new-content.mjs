@@ -43,8 +43,8 @@ const routeFiles = type === 'page'
 
 const templates = type === 'post'
   ? {
-      zh: `---\ntitle: "TODO：中文标题"\npublishedAt: ${date}\ndraft: true\n# tags: [astro, note]\n# updatedAt: ${date}\n---\n\n在这里开始写中文正文。发布前将 \`draft\` 改为 \`false\`。\n`,
-      en: `---\ntitle: "TODO: English title"\npublishedAt: ${date}\ndraft: true\n# tags: [astro, note]\n# updatedAt: ${date}\n---\n\nStart writing the English article here. Change \`draft\` to \`false\` before publishing.\n`,
+      zh: `---\ntitle: "TODO：中文标题"\npublishedAt: ${date}\ndraft: true\n# tags: [astro, note]\n---\n\n在这里开始写中文正文。发布前将 \`draft\` 改为 \`false\`。\n`,
+      en: `---\ntitle: "TODO: English title"\npublishedAt: ${date}\ndraft: true\n# tags: [astro, note]\n---\n\nStart writing the English article here. Change \`draft\` to \`false\` before publishing.\n`,
     }
   : type === 'project' ? {
       zh: `---\nname: "TODO：项目名称"\nhref: https://example.com/${slug}\nstatus: ""\norder: 999\ndraft: true\n# stack: [Astro, TypeScript]\n# image: ./assets/cover.webp\n---\n\n在这里编写项目介绍，可以包含多句话和多个段落。发布前填写真实链接，并将 \`draft\` 改为 \`false\`。\n`,
