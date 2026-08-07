@@ -1,5 +1,4 @@
 ---
-lang: zh
 title: 归档
 kicker: Archive
 emptyState: 暂时还没有中文文章。

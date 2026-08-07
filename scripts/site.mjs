@@ -10,7 +10,7 @@ Site maintenance commands
   pnpm check                             Type-check Astro files and content
   pnpm build                             Run checks and build dist/
   pnpm preview                           Preview a completed production build
-  pnpm new:post -- <slug>                Create paired post drafts and assets/
+  pnpm new:post -- <slug>                Create paired post drafts under YYYY/MM/slug/
   pnpm new:project -- <slug>             Create paired project drafts and assets/
   pnpm new:page -- <slug>                Create a generic bilingual page and routes
   pnpm deploy                            Build, require a clean worktree, then git push

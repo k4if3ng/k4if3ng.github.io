@@ -313,14 +313,14 @@ body[data-code-line-numbers='off'] .prose pre:is(.astro-code, .shiki) .line { pa
 
 @media (max-width: 780px) {
   .shell { width: min(100% - 28px, 680px); }
-  .app { display: block; padding-top: 16px; }
+  .app { display: block; padding-top: 4px; }
   .sidebar { display: none; }
   .layout-divider { display: none; }
   .mobile-bar { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 58px; padding: 10px 0 12px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(14px); }
   .mobile-bar .brand { display: none; }
   .mobile-bar nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; min-width: 0; color: var(--muted); font-family: var(--hand); font-size: 14px; line-height: 1.2; letter-spacing: .02em; }
   .mobile-bar nav a { display: grid; place-items: center; min-width: 0; width: 100%; padding: 3px 0; white-space: nowrap; }
-  .mobile-profile { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 12px 12px; padding: 12px 12px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+  .mobile-profile { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 12px 3px; padding: 12px 12px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
   .mobile-identity { display: inline-flex; align-items: center; gap: 12px; flex: none; min-width: 0; width: fit-content; }
   .mobile-avatar { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); }
   .mobile-identity-text { display: grid; line-height: 1.15; }
@@ -333,6 +333,7 @@ body[data-code-line-numbers='off'] .prose pre:is(.astro-code, .shiki) .line { pa
   .mobile-social-copy strong { display: block; margin-top: 3px; color: var(--text); font-family: var(--font-heading); font-size: 14px; line-height: 1.35; }
   .mobile-socials { flex: none; width: auto; max-width: 180px; margin: 0; justify-content: flex-end; gap: 3px; }
   .mobile-socials > :is(a, .social-placeholder) { width: 26px; height: 26px; }
+  .main { padding-top: 20px; }
   .hero { padding-top: 6px; }
   .hero h1 { font-size: clamp(27px, 8vw, 34px); }
   .post-card { gap: 5px 12px; }

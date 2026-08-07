@@ -2,12 +2,12 @@
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPostExcerpt, getPostPath, getPostTranslations } from '../../lib/posts';
+import { getPostExcerpt, getPostLocale, getPostPath, getPostTranslations } from '../../lib/posts';
 import { t, type Locale } from '../../i18n/ui';
 import { formatDate } from '../../i18n/formatters';
 interface Props { post: CollectionEntry<'posts'>; older?: CollectionEntry<'posts'>; newer?: CollectionEntry<'posts'>; }
 const { post, older, newer } = Astro.props;
-const locale: Locale = post.data.lang;
+const locale: Locale = getPostLocale(post);
 const { Content, headings } = await render(post);
 const toc = headings.filter(({ depth }) => depth === 2 || depth === 3);
 const plainText = (post.body ?? '').replace(/```[\s\S]*?```/g, ' ').replace(/<[^>]+>/g, ' ').replace(/[#>*_~`\[\]()-]/g, ' ');

@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getProjects } from '../../lib/projects';
+import { getProjectExcerpt, getProjects } from '../../lib/projects';
 import type { Locale } from '../../i18n/ui';
 import { getPage } from '../../lib/pages';
 interface Props { locale: Locale; }
@@ -13,7 +13,7 @@ const projects = await getProjects(locale);
   {projects.length ? <div class="projects-grid">
     {projects.map((project, index) => <a class="project-entry project-entry-external" href={project.data.href} target="_blank" rel="noreferrer" data-link-card>
       <div class="project-number">{String(index + 1).padStart(2, '0')}</div>
-      <div class="project-content"><div class="project-heading"><h2>{project.data.name}</h2><span class="project-status">{project.data.status}</span></div><p>{project.data.description}</p><div class="project-meta">{project.data.stack.map(item => <span class="project-tag">#{item}</span>)}</div></div>
+      <div class="project-content"><div class="project-heading"><h2>{project.data.name}</h2>{project.data.status && <span class="project-status">{project.data.status}</span>}</div><p>{getProjectExcerpt(project)}</p><div class="project-meta">{project.data.stack.map(item => <span class="project-tag">#{item}</span>)}</div></div>
       <span class="project-media">{project.data.image && <span class="project-image"><img src={project.data.image.src} width={project.data.image.width} height={project.data.image.height} alt={project.data.name} /></span>}<span class="entry-arrow entry-arrow-external" aria-hidden="true"></span></span>
     </a>)}
   </div> : <p class="empty-state section">{page.data.emptyState}</p>}

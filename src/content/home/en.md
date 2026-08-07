@@ -1,5 +1,4 @@
 ---
-lang: en
 title: Home
 heroTitle: Kaifeng's Blog
 kicker: KAIFENG / BLOG
@@ -9,4 +8,3 @@ recentTitle: Recent writing
 projectsKicker: Selected work
 projectsTitle: Selected projects
 ---
-

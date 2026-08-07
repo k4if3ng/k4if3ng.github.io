@@ -103,7 +103,7 @@
 
 ### 项目
 
-项目存放在 `src/content/projects/`，不再写入 `config.ts`。每个项目使用中文和英文两份 Markdown，并以相同的 `translationKey` 配对。新内容统一使用同名目录，便于将来定位内容和资源：
+项目存放在 `src/content/projects/`，不再写入 `config.ts`。每个项目使用唯一的 `<project-key>` 目录作为内容身份，目录中的 `zh.md` 与 `en.md` 是两种语言版本：
 
 ```text
 src/content/projects/my-project/
@@ -116,19 +116,16 @@ src/content/projects/my-project/
 frontmatter 字段包括：
 
 - `name`
-- `lang`，必须是 `zh` 或 `en`
-- `translationKey`，同一项目的两种语言保持一致
-- `description`
 - `href`
 - `stack`
 - `image`，可省略
-- `status`
+- `status`，可省略或为空
 - `order`，控制首页和项目页顺序
 - `draft`，默认 `false`
 
 项目列表中的 `stack` 会以 `#Astro`、`#TypeScript` 这样的形式展示。项目页的“持续维护”等状态与 tags 共用 `--warm` 语义色：浅色为蓝灰，深色为暖金。
 
-Markdown 正文可以记录更完整的背景和设计说明，目前列表页面使用 frontmatter，正文为将来增加项目详情页预留。`getProjects(locale)` 统一负责过滤语言、排除草稿和排序；首页显示前两个项目，项目页显示全部项目。项目首先按 `order` 升序排列（数值越小越靠前）；`order` 相同才按内容文件 ID 的字母顺序稳定排序。新增或修改项目时应同步维护两种语言文件，页面本身不需要再改。
+项目介绍写在 Markdown 正文中，可以包含多句话和多个段落；列表页和首页使用正文中的第一段普通文字作为摘要。`getProjects(locale)` 从文件路径读取语言，排除草稿并排序；首页显示前两个项目，项目页显示全部项目。项目首先按 `order` 升序排列（数值越小越靠前）；`order` 相同才按内容文件 ID 的字母顺序稳定排序。项目可以只提供中文或只提供英文版本，某种语言不存在或仍是草稿时，不会出现在该语言页面。
 
 ## 4. i18n
 
@@ -140,11 +137,11 @@ Markdown 正文可以记录更完整的背景和设计说明，目前列表页�
 
 - Home、Archive、Projects 和 404 共用 `src/components/pages/` 中的 Astro 结构，根路由与 `/en/` 路由只传入 locale。
 - Home 的页面文案位于 `src/content/home/zh.md` 与 `src/content/home/en.md`；About、Projects 等页面文案位于 `src/content/<page-key>/{zh,en}.md`；Archive 页面文案位于 `src/content/posts/{zh,en}.md`，与文章实体共用目录但由 collection loader 分流。页面视觉素材直接由 Markdown 引用。
-- Project 必须提供 `zh`、`en` 完整配对；`getProjects()` 会在构建期间检查同一 `translationKey` 是否两种语言都存在。
+- Project 使用唯一的 `<project-key>` 目录组织语言版本；可以只发布 `zh.md` 或只发布 `en.md`，`getProjects()` 只返回当前语言中实际存在且非草稿的版本。
 
-Post 可以只有中文或只有英文：中文 URL 是 `/posts/YYYY/MM/slug/`，英文 URL 是 `/en/posts/YYYY/MM/slug/`。只有两篇文章设置相同的 `translationKey` 时才显示语言切换并生成双向 `hreflang`；单语文章的语言按钮保持禁用，不创建不存在的翻译 URL。
+Post 实体位于 `src/content/posts/YYYY/MM/slug/{zh,en}.md`。目录路径同时提供年月、slug 和翻译组身份，文件名提供语言；中文 URL 是 `/posts/YYYY/MM/slug/`，英文 URL 是 `/en/posts/YYYY/MM/slug/`。同一目录中只有实际发布的另一语言文件存在时才显示语言切换并生成双向 `hreflang`；单语文章的语言按钮保持禁用。
 
-所有存在双语版本的页面由 `BaseLayout` 输出 canonical、当前语言与另一语言的 `hreflang`，以及指向中文默认版本的 `x-default`。普通页面按镜像路径切换；Post 根据 `translationKey` 找到实际目标，不通过字符串猜测翻译地址。
+所有存在双语版本的页面由 `BaseLayout` 输出 canonical、当前语言与另一语言的 `hreflang`，以及指向中文默认版本的 `x-default`。普通页面按镜像路径切换；Post 根据同一 `YYYY/MM/slug/` 内容目录查找实际目标，不创建不存在的翻译地址。
 
 不要为了追求“全部抽象”把长正文拆成大量 message key：短 UI 进入 `ui.ts`，可增长的结构化内容进入 Content Collection，复杂动态布局留在共享 Astro 组件中。
 
@@ -167,10 +164,14 @@ src/content/
 └── posts/
     ├── en.md             # Archive 页面文案
     ├── zh.md
-    └── <post-key>/       # 文章实体与 assets
+    └── YYYY/
+        └── MM/
+            └── <slug>/   # 文章实体与 assets
+                ├── en.md
+                └── zh.md
 ```
 
-这些页面文件使用 `lang`、`title`、`kicker`、`emptyState` 等 frontmatter 字段；首页额外使用 `heroTitle`、`kicker` 和 `lead` metadata，页面组件负责输出首页头部，description 类介绍文字直接写在 Markdown 正文中，仍可继续加入链接、强调、段落和图片；动态列表标题和 Archive 搜索提示等保留在相应页面 metadata，供布局和动态组件读取。`motto` 属于站点级配置，统一维护在 `src/config.ts`，通过多行字符串支持手动换行。`src/lib/pages.ts` 的 `getPage(contentKey, locale)` 根据文件路径 `<contentKey>/<locale>.md` 读取唯一内容，`posts` 页面内容因此直接对应 `src/content/posts/{zh,en}.md`。
+这些页面文件使用 `title`、`kicker`、`emptyState` 等 frontmatter 字段，语言由 `zh.md` / `en.md` 文件名决定；首页额外使用 `heroTitle`、`kicker` 和 `lead` metadata，页面组件负责输出首页头部，description 类介绍文字直接写在 Markdown 正文中，仍可继续加入链接、强调、段落和图片；动态列表标题和 Archive 搜索提示等保留在相应页面 metadata，供布局和动态组件读取。`motto` 属于站点级配置，统一维护在 `src/config.ts`，通过多行字符串支持手动换行。`src/lib/pages.ts` 的 `getPage(contentKey, locale)` 根据文件路径 `<contentKey>/<locale>.md` 读取唯一内容；`src/content/posts/{zh,en}.md` 只负责 Archive 页面文案。
 
 `src/i18n/ui.ts` 只保留导航、按钮、tooltip、ARIA、搜索和动态数量等交互性短文案。比如“记录代码、设计，以及仍在生长的想法。”、“项目”、“一些正在生长的作品与实验。”以及各页面空状态，都应分别编辑对应 Markdown，不需要修改 TypeScript。
 
@@ -237,19 +238,19 @@ pnpm new:post -- my-first-note
 pnpm new:project -- my-new-project
 ```
 
-两个命令都只接受小写 kebab-case slug，并生成：
+两个命令都只接受小写 kebab-case slug。Post 根据上海时区的当前日期生成：
 
 ```text
-src/content/posts/my-first-note/
+src/content/posts/YYYY/MM/my-first-note/
 ├── assets/
 │   └── diagram.png
 ├── zh.md
 └── en.md
 ```
 
-项目生成到相同结构的 `projects/<slug>/`。脚手架始终生成 `draft: true`，因此占位标题、示例 URL 和未完成正文不会进入线上站点。文章模板将 `tags`、`updatedAt` 等可选字段作为 YAML 注释；项目模板同样将 `stack`、`image` 作为注释。填写完必填字段并将两份内容的 `draft` 设为 `false` 后，运行 `pnpm run build`。
+Project 生成到 `src/content/projects/<project-key>/{zh,en}.md`，其中 project key 必须唯一。脚手架默认生成两种语言的 `draft: true` 文件，项目只需要一种语言时可以删除另一份文件；占位标题、示例 URL 和未完成正文不会进入线上站点。项目介绍写在 Markdown 正文中，可以包含多句话和多个段落；`status` 可以省略或留空。文章模板将 `tags`、`updatedAt` 等可选字段作为 YAML 注释；项目模板同样将 `stack`、`image` 作为注释。填写完需要发布的语言文件并将其 `draft` 设为 `false` 后，运行 `pnpm run build`。
 
-文章图片和项目封面一律放在各自内容目录的 `assets/`：例如 `src/content/posts/<slug>/assets/diagram.png` 或 `src/content/projects/<slug>/assets/cover.webp`。文章 Markdown 使用 `![说明](./assets/diagram.png)`；项目 frontmatter 使用 `image: ./assets/cover.webp`。Astro 会在构建时将这些本地资源输出到站点资源目录，页面组件不再依赖 `public/images` 中的内容图片。
+文章图片和项目封面一律放在各自内容目录的 `assets/`：例如 `src/content/posts/YYYY/MM/<slug>/assets/diagram.png` 或 `src/content/projects/<project-key>/assets/cover.webp`。文章 Markdown 使用 `![说明](./assets/diagram.png)`；项目 frontmatter 使用 `image: ./assets/cover.webp`。Astro 会在构建时将这些本地资源输出到站点资源目录，页面组件不再依赖 `public/images` 中的内容图片。
 
 当前使用 Astro 的 passthrough 图片服务，因此图片会以原始尺寸与格式输出，不引入 `sharp` 原生依赖。这很适合体积较小、手动处理过的个人站资源；如果将来需要自动裁剪、响应式尺寸、WebP 或 AVIF，再安装 `sharp` 并移除 `astro.config.mjs` 中的 passthrough 配置。
 
@@ -293,41 +294,35 @@ pnpm run preview
 ```yaml
 ---
 title: 中文标题
-slug: english-kebab-case
 publishedAt: 2026-08-04
 updatedAt: 2026-08-05
 tags: [astro, design]
-lang: zh
-translationKey: optional-shared-id
 draft: false
 ---
 ```
 
-### `title`、`slug`、`translationKey` 与 URL
+### 内容路径、`title`、`publishedAt` 与 URL
 
-| 字段 | 职责 | 是否出现在 URL | 双语版本是否相同 |
+| 来源 | 职责 | 是否出现在 URL | 双语版本是否相同 |
 | --- | --- | --- | --- |
+| 路径 `YYYY/MM/slug` | 内容身份、URL 年月、slug 和翻译配对 | 是 | 必须相同 |
+| 文件名 `zh.md` / `en.md` | 语言 | 影响 `/en` 前缀 | 不同 |
 | `title` | 页面标题、列表标题、SEO 标题 | 否 | 通常不同 |
-| `slug` | URL 中可读、稳定的文章标识 | 是 | 推荐相同，也可以不同 |
-| `translationKey` | 标识“这两篇内容互为翻译” | 否 | 必须相同 |
-| `publishedAt` | 提供 URL 中的年份与月份，并控制排序 | 间接出现 | 通常相同 |
+| `publishedAt` | 具体发布日期、精确排序与 RSS 日期 | 否 | 建议相同 |
 
-公开地址由 `lang`、`publishedAt` 与 `slug` 组成：中文为 `/posts/YYYY/MM/<slug>/`，英文为 `/en/posts/YYYY/MM/<slug>/`。例如：
+公开地址直接来自内容路径。中文为 `/posts/YYYY/MM/<slug>/`，英文为 `/en/posts/YYYY/MM/<slug>/`。例如：
 
 ```yaml
-# src/content/posts/content-workflow/zh.md
+# src/content/posts/2025/04/content-workflow/zh.md
 title: 内容工作流
-slug: content-workflow
-translationKey: content-workflow
 publishedAt: 2025-04-14
-lang: zh
 ```
 
-生成地址是 `/posts/2025/04/content-workflow/`；英文文件的 `title` 可为 `Content workflow`，`lang: en` 会生成 `/en/posts/2025/04/content-workflow/`。两者通过相同的 `translationKey` 建立语言切换和 `hreflang` 关系，而不是通过 title、文件夹名或 URL 猜测彼此。
+生成地址是 `/posts/2025/04/content-workflow/`；同一目录的 `en.md` 可使用英文标题，并生成 `/en/posts/2025/04/content-workflow/`。两份内容天然共享同一个 slug，并通过共同的父目录建立语言切换和 `hreflang` 关系。
 
-`slug` 是必填字段，只允许小写英文、数字和单连字符；修改它就会修改公开 URL。Collection 内部 ID 则由源文件路径生成，所以 `zh.md` 和 `en.md` 能自然共用同一个 slug，不会互相覆盖。同一语言、同一月份的重复 URL 会让构建失败。
+年份必须是四位数字，月份必须是 `01`–`12`，slug 只允许小写英文、数字和单连字符。Collection ID 由完整源文件路径生成，因此同一目录的 `zh.md` 和 `en.md` 是两个独立 entry。文件系统天然禁止同一语言、同一月份和同一 slug 的重复路径；不同月份可以重复使用同一个 slug。
 
-`translationKey` 对 Post 是可选字段。同一文章的中英文译本填写相同值；单语文章省略即可。每种语言下同一个 translationKey 最多只能出现一次。
+`publishedAt` 保留具体日期，并在构建时检查它的年份、月份与内容目录一致。Post 可以只有一种语言；另一语言文件缺失或仍是草稿时，不生成语言切换和 `hreflang`。
 
 Note 不再维护 `description` frontmatter。`src/lib/posts.ts` 的 `getPostExcerpt()` 会选取正文中第一个普通段落，清理 Markdown 标记并截断，统一供首页列表、归档搜索、文章 SEO description 和 RSS 使用。开头只有标题、列表、代码块或引用时会继续寻找后面的普通段落；因此建议每篇文章尽早写出一段能独立表达主题的正文。
 
@@ -370,7 +365,7 @@ Note 不再维护 `description` frontmatter。`src/lib/posts.ts` 的 `getPostExc
 - 代码块由 Shiki 构建期 transformer 生成语言工具栏、语言图标和复制按钮。工具栏不再显示 UTF-8、总行数或额外分隔信息，只保留语言标识和复制按钮；代码行号默认关闭。
 - 语言图标优先从 `@iconify-json/logos`、`@iconify-json/simple-icons` 的本地数据生成，不在浏览器运行时请求 Iconify。YAML、TOML、Java、Go、Rust、TypeScript、Python、Bash 等映射集中维护在 `src/config/code-block.json`。
 - 相邻文章按发布时间降序计算；上一篇是更旧内容，下一篇是更新内容。
-- 相邻文章、日期、归档地址和工具栏语言都来自当前 Post 的 `lang`，不会跨语言混排。
+- 相邻文章、日期、归档地址和工具栏语言都来自当前 Post 内容路径解析出的 locale，不会跨语言混排。
 - 工具栏按钮使用 `data-link-plain` 或页内锚点，不会附加普通站内链接标记。
 
 ## 11. 链接
@@ -410,4 +405,4 @@ pnpm run deploy
 5. archive 搜索、项目图片、空社媒占位。
 6. 普通引用、五种 Alert、spoiler、站内／站外链接。
 
-修改 locale、URL、slug 或 `translationKey` 时，还要检查中英文生成目录、两份 RSS、canonical、hreflang 和 sitemap。
+修改 locale、Post 年月/slug 目录或 Project key 时，还要检查中英文生成目录、两份 RSS、canonical、hreflang 和 sitemap。

@@ -1,5 +1,4 @@
 ---
-lang: en
 title: Archive
 kicker: Archive
 emptyState: No English articles yet.

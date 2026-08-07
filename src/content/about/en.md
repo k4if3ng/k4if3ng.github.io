@@ -1,5 +1,4 @@
 ---
-lang: en
 title: About
 kicker: About
 emptyState: There is nothing more to share for now.
